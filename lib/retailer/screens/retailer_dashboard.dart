@@ -1,6 +1,7 @@
 import 'package:e_warranty/provider/login_provider.dart';
 import 'package:e_warranty/retailer/screens/retailer_add_customer.dart';
 import 'package:e_warranty/retailer/screens/retailer_drawer.dart';
+import 'package:e_warranty/retailer/screens/retailer_view_customers.dart';
 import 'package:e_warranty/screens/login.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -87,7 +88,6 @@ class _RetailerDashboardState extends State<RetailerDashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: Colors.white,
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.menu, color: Color(0xFF0D47A1)),
@@ -257,7 +257,14 @@ class _RetailerDashboardState extends State<RetailerDashboard> {
                 icon: Icons.people_rounded,
                 color: Color(0xFF1565C0),
                 bgColor: Color(0xFFE3F2FD),
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const RetailerViewCustomers(),
+                    ),
+                  );
+                },
               ),
             ),
             SizedBox(width: 12),

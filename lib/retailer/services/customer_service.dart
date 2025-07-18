@@ -1,5 +1,9 @@
 import 'dart:convert';
 import 'package:e_warranty/constants/config.dart';
+import 'package:e_warranty/retailer/models/customer_model.dart';
+import 'package:e_warranty/retailer/screens/retailer_view_customers.dart';
+import 'package:e_warranty/utils/shared_preferences.dart';
+
 import 'package:http/http.dart' as http;
 
 Future<void> submitCustomerData(Map<String, dynamic> combinedData) async {
@@ -25,5 +29,36 @@ Future<void> submitCustomerData(Map<String, dynamic> combinedData) async {
     }
   } catch (e) {
     print(' Error: $e');
+  }
+}
+
+
+Future<List<CustomerData>> fetchAllCustomers() async {
+  final url = Uri.parse('${baseUrl}api/customers/all');
+  final token = await SharedPreferenceHelper.instance.getString(
+      'retailer_auth_token',
+    );
+
+  try {
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final customers = data['data']['customers'] as List;
+      print('Customers fetched successfully.');
+      return customers.map((e) => CustomerData.fromJson(e)).toList();
+    } else {
+      print('Failed to fetch customers. Status: ${response.statusCode}');
+      throw Exception("Failed to fetch customers");
+    }
+  } catch (e) {
+    print('Error fetching customers data: $e');
+    throw Exception("Error: $e");
   }
 }
