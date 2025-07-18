@@ -1,4 +1,5 @@
 import 'package:e_warranty/provider/login_provider.dart';
+import 'package:e_warranty/utils/pixelutil.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -56,7 +57,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        padding: EdgeInsets.symmetric(horizontal: ScreenUtil.unitHeight * 20, vertical: ScreenUtil.unitHeight * 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -68,7 +69,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 color: Colors.blue,
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: ScreenUtil.unitHeight * 20),
             _buildPasswordField(
               controller: _currentController,
               label: "Current Password",
@@ -81,7 +82,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               },
               icon: Icons.lock_outline,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: ScreenUtil.unitHeight * 20),
             _buildPasswordField(
               controller: _newController,
               label: "New Password",
@@ -94,7 +95,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               },
               icon: Icons.lock_reset,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: ScreenUtil.unitHeight * 20),
             _buildPasswordField(
               controller: _confirmController,
               label: "Confirm New Password",
@@ -107,10 +108,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               },
               icon: Icons.check_circle_outline,
             ),
-            const SizedBox(height: 40),
+            SizedBox(height: ScreenUtil.unitHeight * 40),
             SizedBox(
               width: double.infinity,
-              height: 56,
+              height: ScreenUtil.unitHeight * 65,
               child: isLoading
                   ? Container(
                       decoration: BoxDecoration(
@@ -176,7 +177,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             color: Colors.black87,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: ScreenUtil.unitHeight * 10),
         TextField(
           controller: controller,
           obscureText: !isVisible,
@@ -207,8 +208,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               ),
             ),
             filled: true,
-            fillColor: Colors.grey[50],
-            contentPadding: const EdgeInsets.symmetric(
+            fillColor: Colors.grey[50],  
+            contentPadding: EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 16,
             ),

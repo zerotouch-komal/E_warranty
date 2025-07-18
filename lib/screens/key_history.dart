@@ -1,4 +1,5 @@
 import 'package:e_warranty/provider/key_provider.dart';
+import 'package:e_warranty/utils/pixelutil.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/key_history_model.dart';
@@ -63,7 +64,7 @@ class _KeyHistoryScreenState extends State<KeyHistoryScreen> {
                     valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2563EB)),
                     strokeWidth: 3,
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: ScreenUtil.unitHeight * 20),
                   Text(
                     "Loading history...",
                     style: TextStyle(
@@ -82,7 +83,7 @@ class _KeyHistoryScreenState extends State<KeyHistoryScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(24),
+                    padding: EdgeInsets.all(ScreenUtil.unitHeight * 20),
                     decoration: BoxDecoration(
                       color: Colors.grey[100],
                       shape: BoxShape.circle,
@@ -93,7 +94,7 @@ class _KeyHistoryScreenState extends State<KeyHistoryScreen> {
                       color: Colors.grey[400],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   Text(
                     "No history available",
                     style: TextStyle(
@@ -102,7 +103,7 @@ class _KeyHistoryScreenState extends State<KeyHistoryScreen> {
                       color: Colors.grey[700],
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: ScreenUtil.unitHeight * 20),
                   Text(
                     "Your key transactions will appear here",
                     style: TextStyle(
@@ -121,7 +122,7 @@ class _KeyHistoryScreenState extends State<KeyHistoryScreen> {
             },
             color: const Color(0xFF2563EB),
             child: ListView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(ScreenUtil.unitHeight * 20),
               itemCount: provider.historyList.length,
               itemBuilder: (context, index) {
                 HistoryItem item = provider.historyList[index];
@@ -132,7 +133,7 @@ class _KeyHistoryScreenState extends State<KeyHistoryScreen> {
                   duration: Duration(milliseconds: 300 + (index * 100)),
                   curve: Curves.easeOutBack,
                   child: Container(
-                    margin: const EdgeInsets.only(bottom: 16),
+                    margin: EdgeInsets.only(bottom: ScreenUtil.unitHeight * 20),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
@@ -152,14 +153,14 @@ class _KeyHistoryScreenState extends State<KeyHistoryScreen> {
                           
                         },
                         child: Padding(
-                          padding: const EdgeInsets.all(20),
+                          padding: EdgeInsets.all(ScreenUtil.unitHeight * 20),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.all(8),
+                                    padding: EdgeInsets.all(ScreenUtil.unitHeight * 10),
                                     decoration: BoxDecoration(
                                       color: const Color(0xFF2563EB).withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(8),
@@ -170,7 +171,7 @@ class _KeyHistoryScreenState extends State<KeyHistoryScreen> {
                                       size: 20,
                                     ),
                                   ),
-                                  const SizedBox(width: 12),
+                                  SizedBox(width: ScreenUtil.unitHeight * 20),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,7 +185,7 @@ class _KeyHistoryScreenState extends State<KeyHistoryScreen> {
                                             letterSpacing: 0.5,
                                           ),
                                         ),
-                                        const SizedBox(height: 2),
+                                        SizedBox(height: ScreenUtil.unitHeight * 5),
                                         Text(
                                           formattedDate,
                                           style: const TextStyle(
@@ -198,9 +199,9 @@ class _KeyHistoryScreenState extends State<KeyHistoryScreen> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: ScreenUtil.unitHeight * 20),
                               Container(
-                                padding: const EdgeInsets.all(12),
+                                padding: EdgeInsets.all(ScreenUtil.unitHeight * 20),
                                 decoration: BoxDecoration(
                                   color: Colors.grey[50],
                                   borderRadius: BorderRadius.circular(8),
@@ -220,11 +221,11 @@ class _KeyHistoryScreenState extends State<KeyHistoryScreen> {
                                               letterSpacing: 0.8,
                                             ),
                                           ),
-                                          const SizedBox(height: 4),
+                                          SizedBox(height: ScreenUtil.unitHeight * 5),
                                           Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 8,
-                                              vertical: 4,
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: ScreenUtil.unitHeight * 5,
+                                              vertical: ScreenUtil.unitHeight * 5,
                                             ),
                                             decoration: BoxDecoration(
                                               color: _getTypeColor(item.keyType).withOpacity(0.1),
@@ -242,7 +243,7 @@ class _KeyHistoryScreenState extends State<KeyHistoryScreen> {
                                         ],
                                       ),
                                     ),
-                                    const SizedBox(width: 16),
+                                    SizedBox(width: ScreenUtil.unitHeight * 20),
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -256,11 +257,11 @@ class _KeyHistoryScreenState extends State<KeyHistoryScreen> {
                                               letterSpacing: 0.8,
                                             ),
                                           ),
-                                          const SizedBox(height: 4),
+                                          SizedBox(height: 4),
                                           Row(
                                             children: [
                                               Container(
-                                                padding: const EdgeInsets.all(4),
+                                                padding: EdgeInsets.all(ScreenUtil.unitHeight * 8),
                                                 decoration: BoxDecoration(
                                                   color: const Color(0xFF059669).withOpacity(0.1),
                                                   shape: BoxShape.circle,
@@ -271,7 +272,7 @@ class _KeyHistoryScreenState extends State<KeyHistoryScreen> {
                                                   size: 12,
                                                 ),
                                               ),
-                                              const SizedBox(width: 6),
+                                              SizedBox(width: ScreenUtil.unitHeight * 10),
                                               Text(
                                                 item.keyCount.toString(),
                                                 style: const TextStyle(
@@ -288,7 +289,7 @@ class _KeyHistoryScreenState extends State<KeyHistoryScreen> {
                                   ],
                                 ),
                               ),
-                              const SizedBox(height: 12),
+                              SizedBox(height: ScreenUtil.unitHeight * 20),
                               Row(
                                 children: [
                                   Icon(
@@ -296,7 +297,7 @@ class _KeyHistoryScreenState extends State<KeyHistoryScreen> {
                                     size: 16,
                                     color: Colors.grey[500],
                                   ),
-                                  const SizedBox(width: 6),
+                                  SizedBox(width: 6),
                                   Text(
                                     item.keyId,
                                     style: TextStyle(

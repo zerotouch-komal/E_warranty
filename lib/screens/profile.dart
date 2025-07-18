@@ -1,6 +1,7 @@
 import 'package:e_warranty/provider/login_provider.dart';
 import 'package:e_warranty/screens/change_password.dart';
 import 'package:e_warranty/screens/login.dart';
+import 'package:e_warranty/utils/pixelutil.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../provider/profile_provider.dart';
@@ -58,12 +59,12 @@ class ProfileScreen extends StatelessWidget {
                         ),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(24, 20, 24, 40),
+                        padding: EdgeInsets.fromLTRB(24, 20, 24, 40),
                         child: Column(
                           children: [
                             Container(
-                              width: 100,
-                              height: 100,
+                              width: ScreenUtil.unitHeight * 100,
+                              height: ScreenUtil.unitHeight * 100,
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.2),
                                 shape: BoxShape.circle,
@@ -78,14 +79,14 @@ class ProfileScreen extends StatelessWidget {
                                       ? user.company.name[0].toUpperCase()
                                       : '?',
                                   style: TextStyle(
-                                    fontSize: 40,
+                                    fontSize: ScreenUtil.unitHeight * 40,
                                     color: Colors.white.withOpacity(0.9),
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(height: ScreenUtil.unitHeight * 20),
 
                             Text(
                               user.company.name,
@@ -102,7 +103,7 @@ class ProfileScreen extends StatelessWidget {
                     ),
 
                     Padding(
-                      padding: const EdgeInsets.all(20),
+                      padding: EdgeInsets.all(ScreenUtil.unitHeight * 20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -111,13 +112,13 @@ class ProfileScreen extends StatelessWidget {
                             icon: Icons.contact_phone_rounded,
                             children: [
                               _buildInfoRow(Icons.person, 'Name', user.name),
-                              const SizedBox(height: 12),
+                              SizedBox(height: ScreenUtil.unitHeight * 20),
                               _buildInfoRow(
                                 Icons.phone_rounded,
                                 'Phone',
                                 user.phone,
                               ),
-                              const SizedBox(height: 12),
+                              SizedBox(height: ScreenUtil.unitHeight * 20),
                               _buildInfoRow(
                                 Icons.email_rounded,
                                 'Email',
@@ -126,7 +127,7 @@ class ProfileScreen extends StatelessWidget {
                             ],
                           ),
 
-                          const SizedBox(height: 16),
+                          SizedBox(height: ScreenUtil.unitHeight * 20),
 
                           _buildInfoCard(
                             title: 'Address',
@@ -137,13 +138,13 @@ class ProfileScreen extends StatelessWidget {
                                 'Location',
                                 '${companyAddress.street}, ${companyAddress.city}',
                               ),
-                              const SizedBox(height: 12),
+                              SizedBox(height: ScreenUtil.unitHeight * 20),
                               _buildInfoRow(
                                 Icons.map_rounded,
                                 'Region',
                                 '${companyAddress.state}, ${companyAddress.country}',
                               ),
-                              const SizedBox(height: 12),
+                              SizedBox(height: ScreenUtil.unitHeight * 20),
                               _buildInfoRow(
                                 Icons.local_post_office_rounded,
                                 'Zip Code',
@@ -152,11 +153,11 @@ class ProfileScreen extends StatelessWidget {
                             ],
                           ),
 
-                          const SizedBox(height: 16),
+                          SizedBox(height: ScreenUtil.unitHeight * 20),
 
                           _buildKeyAllocationCard(userKeys),
 
-                          const SizedBox(height: 24),
+                          SizedBox(height: ScreenUtil.unitHeight * 20),
 
                           SizedBox(
                             width: double.infinity,
@@ -166,15 +167,15 @@ class ProfileScreen extends StatelessWidget {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF1976D2),
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 16,
+                                padding: EdgeInsets.symmetric(
+                                  vertical:ScreenUtil.unitHeight * 20,
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 elevation: 2,
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
@@ -182,7 +183,7 @@ class ProfileScreen extends StatelessWidget {
                                     size: 20,
                                     color: Colors.white,
                                   ),
-                                  SizedBox(width: 8),
+                                  SizedBox(width: ScreenUtil.unitHeight * 20),
                                   Text(
                                     'Change Password',
                                     style: TextStyle(
@@ -195,7 +196,7 @@ class ProfileScreen extends StatelessWidget {
                             ),
                           ),
 
-                          const SizedBox(height: 16),
+                          SizedBox(height: ScreenUtil.unitHeight * 20),
 
                           SizedBox(
                             width: double.infinity,
@@ -204,7 +205,7 @@ class ProfileScreen extends StatelessWidget {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.red.shade600,
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
+                                padding: EdgeInsets.symmetric(
                                   vertical: 16,
                                 ),
                                 shape: RoundedRectangleBorder(
@@ -253,21 +254,21 @@ class ProfileScreen extends StatelessWidget {
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(ScreenUtil.unitHeight * 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: EdgeInsets.all(ScreenUtil.unitHeight * 10),
                   decoration: BoxDecoration(
                     color: const Color(0xFF1976D2).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(icon, color: const Color(0xFF1976D2), size: 20),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Text(
                   title,
                   style: const TextStyle(
@@ -278,7 +279,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: ScreenUtil.unitHeight * 20),
             ...children,
           ],
         ),
@@ -290,7 +291,7 @@ class ProfileScreen extends StatelessWidget {
     return Row(
       children: [
         Icon(icon, size: 18, color: Colors.grey.shade600),
-        const SizedBox(width: 12),
+        SizedBox(width: ScreenUtil.unitHeight * 20),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -303,7 +304,7 @@ class ProfileScreen extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 2),
+              SizedBox(height: ScreenUtil.unitHeight * 4),
               Text(
                 value,
                 style: const TextStyle(
@@ -340,14 +341,14 @@ class ProfileScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(ScreenUtil.unitHeight * 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: const Color(0xFF1976D2).withOpacity(0.2),
                       borderRadius: BorderRadius.circular(8),
@@ -358,7 +359,7 @@ class ProfileScreen extends StatelessWidget {
                       size: 20,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   const Text(
                     'Keys',
                     style: TextStyle(
@@ -369,7 +370,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: ScreenUtil.unitHeight * 20),
 
               Container(
                 height: 8,
@@ -391,11 +392,11 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              SizedBox(height: ScreenUtil.unitHeight * 20),
 
               Row(
                 children: [
-                  const SizedBox(width: 12),
+                  SizedBox(width: ScreenUtil.unitHeight * 20),
                   Expanded(
                     child: _buildKeyStatItem(
                       'Keys',
@@ -404,7 +405,7 @@ class ProfileScreen extends StatelessWidget {
                       const Color(0xFF4CAF50),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: ScreenUtil.unitHeight * 20),
                   Expanded(
                     child: _buildKeyStatItem(
                       'Used',
@@ -429,7 +430,7 @@ class ProfileScreen extends StatelessWidget {
     Color color,
   ) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -438,7 +439,7 @@ class ProfileScreen extends StatelessWidget {
       child: Column(
         children: [
           Icon(icon, color: color, size: 24),
-          const SizedBox(height: 8),
+          SizedBox(height: ScreenUtil.unitHeight * 10),
           Text(
             value,
             style: TextStyle(
@@ -447,7 +448,7 @@ class ProfileScreen extends StatelessWidget {
               color: color,
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: ScreenUtil.unitHeight * 10),
           Text(
             label,
             style: TextStyle(

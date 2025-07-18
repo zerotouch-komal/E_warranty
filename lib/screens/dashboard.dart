@@ -1,5 +1,6 @@
 import 'package:e_warranty/provider/dashboard_provider.dart';
 import 'package:e_warranty/screens/key_history.dart';
+import 'package:e_warranty/utils/pixelutil.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -36,9 +37,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         elevation: 0,
         foregroundColor: Colors.black87,
         shadowColor: Colors.black12,
-        title: const Text(
+        title: Text(
           'Dashboard',
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: ScreenUtil.unitHeight * 26),
         ),
         actions: [
           IconButton(
@@ -66,13 +67,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
             return Center(
               child: Text(
                 'No data available',
-                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                style: TextStyle(fontSize: ScreenUtil.unitHeight * 20, color: Colors.grey[600]),
               ),
             );
           }
 
           return SingleChildScrollView(
-            padding: EdgeInsets.all(20),
+            padding: EdgeInsets.all(ScreenUtil.unitHeight * 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -107,7 +108,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Text(
                 'Key Statistics',
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: ScreenUtil.unitHeight * 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.grey[800],
                 ),
@@ -125,15 +126,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 label: const Text('View History'),
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.blue[600],
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: ScreenUtil.unitHeight * 20,
+                    vertical: ScreenUtil.unitHeight * 20,
                   ),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 16),
+          SizedBox(height: ScreenUtil.unitHeight * 20),
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -146,7 +147,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ],
             ),
-            padding: EdgeInsets.all(24),
+            padding: EdgeInsets.all(ScreenUtil.unitHeight * 24),
             child: Row(
               children: [
                 Expanded(
@@ -159,9 +160,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 Container(
                   width: 1,
-                  height: 60,
+                  height: ScreenUtil.unitHeight * 20,
                   color: Colors.grey[200],
-                  margin: EdgeInsets.symmetric(horizontal: 16),
+                  margin: EdgeInsets.symmetric(horizontal: ScreenUtil.unitHeight * 20),
                 ),
                 Expanded(
                   child: _buildStatCard(
@@ -195,20 +196,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           child: Icon(icon, color: color, size: 24),
         ),
-        SizedBox(height: 8),
+        SizedBox(height: ScreenUtil.unitHeight * 20),
         Text(
           value,
           style: TextStyle(
-            fontSize: 28,
+            fontSize: ScreenUtil.unitHeight * 20,
             fontWeight: FontWeight.bold,
             color: Colors.grey[800],
           ),
         ),
-        SizedBox(height: 4),
+        SizedBox(height: ScreenUtil.unitHeight * 10),
         Text(
           title,
           style: TextStyle(
-            fontSize: 14,
+            fontSize: ScreenUtil.unitHeight * 16,
             color: Colors.grey[600],
             fontWeight: FontWeight.w500,
           ),
@@ -289,7 +290,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           crossAxisCount: crossAxisCount,
                           crossAxisSpacing: 16,
                           mainAxisSpacing: 16,
-                          childAspectRatio: 1.1,
+                          childAspectRatio: ScreenUtil.unitHeight * 0.99,
                         ),
                         itemBuilder: (context, index) {
                           final userType = stats.userTypeCount[index];
@@ -315,7 +316,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   color: color.withOpacity(0.2),
                                 ),
                               ),
-                              padding: const EdgeInsets.all(16),
+                              padding: EdgeInsets.all(ScreenUtil.unitHeight * 20),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -323,7 +324,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     backgroundColor: color,
                                     child: Icon(icon, color: Colors.white),
                                   ),
-                                  const SizedBox(height: 12),
+                                 SizedBox(height: ScreenUtil.unitHeight * 20),
                                   Text(
                                     _truncateUserType(typeKey),
                                     style: const TextStyle(
@@ -358,7 +359,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               size: 50,
                               color: Colors.grey[400],
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(height: ScreenUtil.unitHeight * 20),
                             const Text(
                               'No user type data available',
                               style: TextStyle(
@@ -398,12 +399,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Text(
             'Recently Added Users',
             style: TextStyle(
-              fontSize: 24,
+              fontSize: ScreenUtil.unitHeight * 24,
               fontWeight: FontWeight.bold,
               color: Colors.grey[800],
             ),
           ),
-          SizedBox(height: 16),
+          SizedBox(height: ScreenUtil.unitHeight * 20),
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -424,8 +425,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   children: [
                     Container(
                       padding: EdgeInsets.symmetric(
-                        vertical: 16,
-                        horizontal: 8,
+                        vertical: ScreenUtil.unitHeight * 20,
+                        horizontal: ScreenUtil.unitHeight * 15,
                       ),
                       decoration: BoxDecoration(
                         color: Colors.grey[50],
@@ -480,7 +481,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 8),
+                    SizedBox(height: ScreenUtil.unitHeight * 10),
 
                     if (stats.lastAddedUsers != null &&
                         stats.lastAddedUsers.isNotEmpty)

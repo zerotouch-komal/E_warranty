@@ -1,6 +1,7 @@
 import 'package:e_warranty/provider/login_provider.dart';
 import 'package:e_warranty/retailer/screens/retailer_dashboard.dart';
 import 'package:e_warranty/screens/drawer.dart';
+import 'package:e_warranty/utils/pixelutil.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -90,11 +91,11 @@ class _LoginScreenState extends State<LoginScreen>
         obscureText: isPassword && !_isPasswordVisible,
         keyboardType: keyboardType,
         validator: validator,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        style: TextStyle(fontSize: ScreenUtil.unitHeight * 18, fontWeight: FontWeight.w500),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(color: Colors.grey[600], fontSize: 14),
-          prefixIcon: Icon(icon, color: Colors.grey[600], size: 22),
+          labelStyle: TextStyle(color: Colors.grey[600], fontSize: ScreenUtil.unitHeight * 20),
+          prefixIcon: Icon(icon, color: Colors.grey[600], size: ScreenUtil.unitHeight * 24),
           suffixIcon:
               isPassword
                   ? IconButton(
@@ -129,9 +130,9 @@ class _LoginScreenState extends State<LoginScreen>
           ),
           filled: true,
           fillColor: Colors.grey[50],
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 18,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: ScreenUtil.unitHeight * 24,
+            vertical: ScreenUtil.unitHeight * 24,
           ),
         ),
       ),
@@ -148,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen>
   }) {
     return SizedBox(
       width: double.infinity,
-      height: 56,
+      height: ScreenUtil.unitHeight * 65,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
@@ -166,9 +167,9 @@ class _LoginScreenState extends State<LoginScreen>
         ),
         child:
             isLoading
-                ? const SizedBox(
-                  height: 20,
-                  width: 20,
+                ? SizedBox(
+                  height: ScreenUtil.unitHeight * 20,
+                  width: ScreenUtil.unitHeight * 20,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
@@ -176,8 +177,8 @@ class _LoginScreenState extends State<LoginScreen>
                 )
                 : Text(
                   text,
-                  style: const TextStyle(
-                    fontSize: 16,
+                  style: TextStyle(
+                    fontSize: ScreenUtil.unitHeight * 20,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -295,8 +296,8 @@ class _LoginScreenState extends State<LoginScreen>
 
                         Center(
                           child: Container(
-                            width: 80,
-                            height: 80,
+                            width: ScreenUtil.unitHeight * 100,
+                            height: ScreenUtil.unitHeight * 100,
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
                                 colors: [Colors.blue, Colors.blueAccent],
@@ -312,15 +313,15 @@ class _LoginScreenState extends State<LoginScreen>
                                 ),
                               ],
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.lock_outline,
                               color: Colors.white,
-                              size: 40,
+                              size: ScreenUtil.unitHeight * 50,
                             ),
                           ),
                         ),
 
-                        const SizedBox(height: 40),
+                       SizedBox(height: ScreenUtil.unitHeight * 60),
 
                         const Text(
                           'Welcome Back',
@@ -331,18 +332,18 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                         ),
 
-                        const SizedBox(height: 8),
+                        SizedBox(height: ScreenUtil.unitHeight * 15),
 
                         Text(
                           'Sign in to your account',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: ScreenUtil.unitHeight * 18,
                             color: Colors.grey[600],
                             fontWeight: FontWeight.w400,
                           ),
                         ),
 
-                        const SizedBox(height: 40),
+                        SizedBox(height: ScreenUtil.unitHeight * 60),
 
                         Form(
                           key: _formKey,
@@ -356,7 +357,7 @@ class _LoginScreenState extends State<LoginScreen>
                                 keyboardType: TextInputType.emailAddress,
                               ),
 
-                              const SizedBox(height: 20),
+                              SizedBox(height: ScreenUtil.unitHeight * 25),
 
                               _buildInputField(
                                 controller: _passwordController,
@@ -392,7 +393,7 @@ class _LoginScreenState extends State<LoginScreen>
                               //     ),
                               //   ],
                               // ),
-                              const SizedBox(height: 32),
+                              SizedBox(height: ScreenUtil.unitHeight * 40),
 
                               _buildButton(
                                 text: 'Sign In',

@@ -3,6 +3,7 @@ import 'package:e_warranty/screens/dashboard.dart';
 import 'package:e_warranty/screens/key_history.dart';
 import 'package:e_warranty/screens/profile.dart';
 import 'package:e_warranty/screens/all_user.dart';
+import 'package:e_warranty/utils/pixelutil.dart';
 import 'package:flutter/material.dart';
 
 class MyDrawer extends StatefulWidget {
@@ -36,7 +37,7 @@ class _MyDrawerState extends State<MyDrawer> {
     onPopInvoked: (didPop) {
       if (!didPop && _selectedIndex != 0) {
         setState(() {
-          _selectedIndex = 0; // Navigate back to Dashboard tab
+          _selectedIndex = 0;
         });
       }
     },
@@ -56,7 +57,7 @@ class _MyDrawerState extends State<MyDrawer> {
         ),
         child: SafeArea(
           child: SizedBox(
-            height: 70,
+            height: ScreenUtil.unitHeight * 100,
             child: BottomNavigationBar(
               currentIndex: _selectedIndex,
               onTap: _onItemTapped,
@@ -75,59 +76,59 @@ class _MyDrawerState extends State<MyDrawer> {
                 fontWeight: FontWeight.w500,
                 letterSpacing: 0.3,
               ),
-              items: const [
+              items: [
                 BottomNavigationBarItem(
                   icon: Padding(
-                    padding: EdgeInsets.only(bottom: 4),
-                    child: Icon(Icons.dashboard_outlined, size: 24),
+                    padding: EdgeInsets.only(bottom: ScreenUtil.unitHeight * 10),
+                    child: Icon(Icons.dashboard_outlined, size: ScreenUtil.unitHeight * 24),
                   ),
                   activeIcon: Padding(
-                    padding: EdgeInsets.only(bottom: 4),
-                    child: Icon(Icons.dashboard_rounded, size: 24),
+                    padding: EdgeInsets.only(bottom: ScreenUtil.unitHeight * 10),
+                    child: Icon(Icons.dashboard_rounded, size: ScreenUtil.unitHeight * 24),
                   ),
                   label: 'Dashboard',
                 ),
                 BottomNavigationBarItem(
                   icon: Padding(
-                    padding: EdgeInsets.only(bottom: 4),
-                    child: Icon(Icons.people_outline_rounded, size: 24),
+                    padding: EdgeInsets.only(bottom: ScreenUtil.unitHeight * 5),
+                    child: Icon(Icons.people_outline_rounded, size: ScreenUtil.unitHeight * 30),
                   ),
                   activeIcon: Padding(
-                    padding: EdgeInsets.only(bottom: 4),
-                    child: Icon(Icons.people_rounded, size: 24),
+                    padding: EdgeInsets.only(bottom: ScreenUtil.unitHeight * 5),
+                    child: Icon(Icons.people_rounded, size: ScreenUtil.unitHeight * 30),
                   ),
                   label: 'Users',
                 ),
                 BottomNavigationBarItem(
                   icon: Padding(
-                    padding: EdgeInsets.only(bottom: 4),
-                    child: Icon(Icons.person_add_outlined, size: 24),
+                    padding: EdgeInsets.only(bottom: ScreenUtil.unitHeight * 10),
+                    child: Icon(Icons.person_add_outlined, size: ScreenUtil.unitHeight * 30),
                   ),
                   activeIcon: Padding(
-                    padding: EdgeInsets.only(bottom: 4),
-                    child: Icon(Icons.person_add_rounded, size: 24),
+                    padding: EdgeInsets.only(bottom: ScreenUtil.unitHeight * 5),
+                    child: Icon(Icons.person_add_rounded, size: ScreenUtil.unitHeight * 30),
                   ),
                   label: 'Add Users',
                 ),
                 BottomNavigationBarItem(
                   icon: Padding(
-                    padding: EdgeInsets.only(bottom: 4),
-                    child: Icon(Icons.vpn_key_outlined, size: 24),
+                    padding: EdgeInsets.only(bottom: ScreenUtil.unitHeight * 5),
+                    child: Icon(Icons.vpn_key_outlined, size: ScreenUtil.unitHeight * 30),
                   ),
                   activeIcon: Padding(
-                    padding: EdgeInsets.only(bottom: 4),
-                    child: Icon(Icons.vpn_key_rounded, size: 24),
+                    padding: EdgeInsets.only(bottom: ScreenUtil.unitHeight * 5),
+                    child: Icon(Icons.vpn_key_rounded, size: ScreenUtil.unitHeight * 30),
                   ),
                   label: 'Key History',
                 ),
                 BottomNavigationBarItem(
                   icon: Padding(
-                    padding: EdgeInsets.only(bottom: 4),
-                    child: Icon(Icons.person_outline_rounded, size: 24),
+                    padding: EdgeInsets.only(bottom: ScreenUtil.unitHeight * 5),
+                    child: Icon(Icons.person_outline_rounded, size: ScreenUtil.unitHeight * 30),
                   ),
                   activeIcon: Padding(
-                    padding: EdgeInsets.only(bottom: 4),
-                    child: Icon(Icons.person_rounded, size: 24),
+                    padding: EdgeInsets.only(bottom: ScreenUtil.unitHeight * 5),
+                    child: Icon(Icons.person_rounded, size: ScreenUtil.unitHeight * 30),
                   ),
                   label: 'Profile',
                 ),

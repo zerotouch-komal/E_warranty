@@ -4,6 +4,7 @@ import 'package:e_warranty/provider/key_provider.dart';
 import 'package:e_warranty/provider/login_provider.dart';
 import 'package:e_warranty/provider/profile_provider.dart';
 import 'package:e_warranty/screens/splashscreen.dart';
+import 'package:e_warranty/utils/pixelutil.dart';
 import 'package:e_warranty/utils/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -20,6 +21,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    
+    ScreenUtil.initialize(context);
+    
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => AuthProvider()),

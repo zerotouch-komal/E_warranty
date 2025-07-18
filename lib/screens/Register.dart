@@ -1,4 +1,5 @@
 import 'package:e_warranty/provider/all_user_provider.dart';
+import 'package:e_warranty/utils/pixelutil.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -48,7 +49,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   color: Colors.white,
                   size: 20,
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: ScreenUtil.unitHeight * 20),
                 Expanded(
                   child: Text(
                     message,
@@ -102,7 +103,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _buildSectionHeader("Personal Information", Icons.person_outline),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               _buildTextField(
                 "Full Name",
                 icon: Icons.person_outline,
@@ -183,13 +184,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 (v) => setState(() => userType = v),
               ),
 
-              const SizedBox(height: 32),
+              SizedBox(height: 32),
 
               _buildSectionHeader(
                 "Address Information",
                 Icons.location_on_outlined,
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               _buildTextField(
                 "Street Address",
                 icon: Icons.home_outlined,
@@ -204,7 +205,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       onSaved: (v) => city = v,
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   Expanded(
                     child: _buildTextField(
                       "State",
@@ -223,7 +224,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       onSaved: (v) => country = v,
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   Expanded(
                     child: _buildTextField(
                       "Zip Code",
@@ -235,10 +236,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ],
               ),
 
-              const SizedBox(height: 40),
+              SizedBox(height: ScreenUtil.unitHeight * 20),
 
               SizedBox(
-                height: 56,
+                height: ScreenUtil.unitHeight * 60,
                 child:
                     provider.isLoading
                         ? Container(
@@ -248,8 +249,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           child: Center(
                             child: SizedBox(
-                              height: 24,
-                              width: 24,
+                              height: ScreenUtil.unitHeight * 20,
+                              width: ScreenUtil.unitHeight * 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
                                 valueColor: AlwaysStoppedAnimation<Color>(
@@ -292,7 +293,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Row(
       children: [
         Icon(icon, size: 20, color: colorScheme.primary),
-        const SizedBox(width: 8),
+        SizedBox(width: 8),
         Text(
           title,
           style: theme.textTheme.titleMedium?.copyWith(

@@ -1,6 +1,7 @@
 import 'package:e_warranty/provider/all_user_provider.dart';
 import 'package:e_warranty/provider/key_provider.dart';
 import 'package:e_warranty/screens/single_user.dart';
+import 'package:e_warranty/utils/pixelutil.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -50,7 +51,7 @@ class _UserListScreenState extends State<UserListScreen> {
   }
 
   Widget _buildLoadingState() {
-    return const Center(
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -58,7 +59,7 @@ class _UserListScreenState extends State<UserListScreen> {
             strokeWidth: 3,
             valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
           ),
-          SizedBox(height: 16),
+          SizedBox(height: ScreenUtil.unitHeight * 20),
           Text(
             'Loading users...',
             style: TextStyle(
@@ -82,7 +83,7 @@ class _UserListScreenState extends State<UserListScreen> {
         await userProvider.fetchAllUsers();
       },
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(ScreenUtil.unitHeight * 20),
         itemCount: users.length,
         itemBuilder: (context, index) {
           final user = users[index];
@@ -104,7 +105,7 @@ class _UserListScreenState extends State<UserListScreen> {
         );
       },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
+        margin: EdgeInsets.only(bottom: ScreenUtil.unitHeight * 20),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -117,7 +118,7 @@ class _UserListScreenState extends State<UserListScreen> {
           ],
         ),
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(ScreenUtil.unitHeight * 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -149,11 +150,11 @@ class _UserListScreenState extends State<UserListScreen> {
                             color: Colors.black87,
                           ),
                         ),
-                        const SizedBox(height: 2),
+                        SizedBox(height: ScreenUtil.unitHeight * 5),
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: ScreenUtil.unitHeight * 5,
+                            vertical: ScreenUtil.unitHeight * 5,
                           ),
                           decoration: BoxDecoration(
                             color: Colors.blueAccent.withOpacity(0.1),
@@ -174,7 +175,7 @@ class _UserListScreenState extends State<UserListScreen> {
                   
                 ],
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: ScreenUtil.unitHeight * 20),
               Row(
                 children: [
                   Icon(Icons.person_outline, size: 16, color: Colors.grey[600]),
@@ -197,7 +198,7 @@ class _UserListScreenState extends State<UserListScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: ScreenUtil.unitHeight * 20),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -209,7 +210,7 @@ class _UserListScreenState extends State<UserListScreen> {
                       color: Colors.grey[700],
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: ScreenUtil.unitHeight * 20),
                   Row(
                     children: [
                       Expanded(
@@ -220,7 +221,7 @@ class _UserListScreenState extends State<UserListScreen> {
                           color: Colors.blue,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      SizedBox(width: ScreenUtil.unitHeight * 20),
                       Expanded(
                         child: _buildKeyStatCard(
                           title: "Used Keys",
@@ -237,7 +238,7 @@ class _UserListScreenState extends State<UserListScreen> {
                 ],
               ),
 
-            const SizedBox(height: 16),
+            SizedBox(height: ScreenUtil.unitHeight * 20),
               
               SizedBox(
                 width: double.infinity,
@@ -267,9 +268,9 @@ class _UserListScreenState extends State<UserListScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: ScreenUtil.unitHeight * 20,
+                      vertical: ScreenUtil.unitHeight * 20,
                     ),
                   ),
                 ),
@@ -324,7 +325,7 @@ void _handleTransferKey(BuildContext context, String userId) async {
                       size: 24,
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: ScreenUtil.unitHeight * 20),
                   const Expanded(
                     child: Text(
                       "Transfer Keys",
@@ -338,7 +339,7 @@ void _handleTransferKey(BuildContext context, String userId) async {
                 ],
               ),
 
-              const SizedBox(height: 24),
+              SizedBox(height: ScreenUtil.unitHeight * 20),
 
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -382,9 +383,9 @@ void _handleTransferKey(BuildContext context, String userId) async {
                       width: 2,
                     ),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 16,
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: ScreenUtil.unitHeight * 20,
+                    vertical: ScreenUtil.unitHeight * 20,
                   ),
                   prefixIcon: Icon(
                     Icons.numbers_rounded,
@@ -393,7 +394,7 @@ void _handleTransferKey(BuildContext context, String userId) async {
                 ),
               ),
 
-              const SizedBox(height: 32),
+              SizedBox(height: ScreenUtil.unitHeight * 20),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -402,7 +403,7 @@ void _handleTransferKey(BuildContext context, String userId) async {
                     onPressed: () => Navigator.of(context).pop(),
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.black54,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      padding: EdgeInsets.symmetric(horizontal: ScreenUtil.unitHeight * 20, vertical: ScreenUtil.unitHeight * 20),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -412,7 +413,7 @@ void _handleTransferKey(BuildContext context, String userId) async {
                       style: TextStyle(fontWeight: FontWeight.w500),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: ScreenUtil.unitHeight * 20),
                   FilledButton(
                     onPressed: () async {
                       final count = int.tryParse(controller.text);
@@ -446,7 +447,7 @@ void _handleTransferKey(BuildContext context, String userId) async {
                                 backgroundColor: Colors.green.shade600,
                                 behavior: SnackBarBehavior.floating,
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                margin: const EdgeInsets.all(16),
+                                margin: EdgeInsets.all(ScreenUtil.unitHeight * 20),
                               ),
                             );
                             context.read<UserProvider>().fetchAllUsers();
@@ -458,7 +459,7 @@ void _handleTransferKey(BuildContext context, String userId) async {
                                 content: Row(
                                   children: [
                                     const Icon(Icons.error_outline, color: Colors.white, size: 20),
-                                    const SizedBox(width: 12),
+                                    SizedBox(width: ScreenUtil.unitHeight * 20),
                                     Expanded(
                                       child: Text(
                                         keyProvider.error ?? "Failed to transfer keys",

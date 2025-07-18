@@ -1,4 +1,5 @@
 import 'package:e_warranty/provider/all_user_provider.dart';
+import 'package:e_warranty/utils/pixelutil.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -57,7 +58,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                       ),
                       strokeWidth: 3,
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
                     Text(
                       "Loading user details...",
                       style: TextStyle(color: Colors.grey[600], fontSize: 16),
@@ -75,7 +76,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                       size: 64,
                       color: Colors.grey[400],
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
                     Text(
                       "No user data found",
                       style: TextStyle(
@@ -84,7 +85,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     Text(
                       "The requested user information is not available",
                       style: TextStyle(fontSize: 14, color: Colors.grey[500]),
@@ -93,12 +94,12 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                 ),
               )
               : SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(ScreenUtil.unitHeight * 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildProfileCard(provider),
-                    const SizedBox(height: 24),
+                    SizedBox(height: ScreenUtil.unitHeight * 20),
 
                     _buildSection(
                       title: "Personal Information",
@@ -130,7 +131,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: ScreenUtil.unitHeight * 20),
 
                     _buildSection(
                       title: "Address",
@@ -163,14 +164,14 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: ScreenUtil.unitHeight * 20),
 
                     _buildSection(
                       title: "Key Allocation",
                       icon: Icons.vpn_key_outlined,
                       children: [_buildKeyAllocationCard(provider)],
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: ScreenUtil.unitHeight * 20),
                   ],
                 ),
               ),
@@ -180,7 +181,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
   Widget _buildProfileCard(UserProvider provider) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(ScreenUtil.unitHeight * 20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -195,8 +196,8 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
       child: Column(
         children: [
           Container(
-            width: 80,
-            height: 80,
+            width: ScreenUtil.unitHeight * 100,
+            height: ScreenUtil.unitHeight * 100,
             decoration: BoxDecoration(
               color: Theme.of(context).primaryColor.withOpacity(0.1),
               shape: BoxShape.circle,
@@ -214,7 +215,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: ScreenUtil.unitHeight * 10),
           Text(
             provider.userDetails!.name,
             style: const TextStyle(
@@ -223,14 +224,14 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
               color: Colors.black87,
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: ScreenUtil.unitHeight * 15),
           Text(
             provider.userDetails!.email,
             style: TextStyle(fontSize: 16, color: Colors.grey[600]),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.unitHeight * 20, vertical: 6),
             decoration: BoxDecoration(
               color:
                   provider.userDetails!.isActive
@@ -280,7 +281,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
           Row(
             children: [
               Icon(icon, size: 24, color: Theme.of(context).primaryColor),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               Text(
                 title,
                 style: const TextStyle(
@@ -291,7 +292,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: ScreenUtil.unitHeight * 20),
           ...children,
         ],
       ),
@@ -305,7 +306,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, size: 20, color: Colors.grey[500]),
-          const SizedBox(width: 12),
+          SizedBox(width: ScreenUtil.unitHeight * 20),
           Expanded(
             flex: 2,
             child: Text(
@@ -340,7 +341,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
             size: 20,
             color: isActive ? Colors.green[500] : Colors.red[500],
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: ScreenUtil.unitHeight * 20),
           Expanded(
             flex: 2,
             child: Text(
@@ -435,7 +436,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: ScreenUtil.unitHeight * 20),
           Text(
             title,
             style: TextStyle(
