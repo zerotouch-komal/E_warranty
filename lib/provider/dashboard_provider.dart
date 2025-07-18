@@ -11,10 +11,26 @@ class DashboardProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
 
   Future<void> loadDashboardStats() async {
-    _isLoading = true;
-    notifyListeners();
-    _stats = await _service.fetchDashboardStats();
+    if (_stats == null) {
+      _isLoading = true;
+      notifyListeners();
+    }
+
+    final freshData = await _service.fetchDashboardStats();
+    _stats = freshData;
+
     _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> refreshDashboardStatsSilently() async {
+    final freshData = await _service.fetchDashboardStats();
+    _stats = freshData;
+    notifyListeners();
+  }
+
+  void clearStats() {
+    _stats = null;
     notifyListeners();
   }
 }

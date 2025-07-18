@@ -16,18 +16,18 @@ class EWarrantyApp extends StatelessWidget {
           foregroundColor: Color(0xFF0D47A1), // Very dark blue
         ),
       ),
-      home: DashboardScreen(),
+      home: RetailerDashboard(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class DashboardScreen extends StatefulWidget {
+class RetailerDashboard extends StatefulWidget {
   @override
-  _DashboardScreenState createState() => _DashboardScreenState();
+  _RetailerDashboardState createState() => _RetailerDashboardState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _RetailerDashboardState extends State<RetailerDashboard> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   // Mock data

@@ -1,5 +1,6 @@
 import 'package:e_warranty/provider/login_provider.dart';
-import 'package:e_warranty/screens/drawer.dart';
+import 'package:e_warranty/screens/change_password.dart';
+import 'package:e_warranty/screens/login.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../provider/profile_provider.dart';
@@ -9,6 +10,11 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<ProfileProvider>(context, listen: false).loadUserProfile();
+    });
+    
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
@@ -20,30 +26,22 @@ class ProfileScreen extends StatelessWidget {
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-      drawer: MyDrawer(currentRoute: '/profile'),
-      body: FutureBuilder(
-        future:
-            Provider.of<ProfileProvider>(
-              context,
-              listen: false,
-            ).loadUserProfile(),
-        builder: (context, snapshot) {
-          return Consumer<ProfileProvider>(
-            builder: (context, provider, _) {
-              if (provider.isLoading || provider.user == null) {
-                return const Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Color(0xFF1976D2),
-                    ),
-                  ),
-                );
-              }
-              final user = provider.user!;
-              final companyAddress = user.company.address;
-              final userKeys = user.keyAllocation;
 
-              return SingleChildScrollView(
+      body: Consumer<ProfileProvider>(
+        builder: (context, provider, _) {
+          if (provider.isLoading || provider.user == null) {
+            return const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1976D2)),
+              ),
+            );
+          }
+
+          final user = provider.user!;
+          final companyAddress = user.company.address;
+          final userKeys = user.keyAllocation;
+
+          return SingleChildScrollView(
                 child: Column(
                   children: [
                     Container(
@@ -163,6 +161,45 @@ class ProfileScreen extends StatelessWidget {
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
+                              onPressed:
+                                  () => _navigateToChangePassword(context),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF1976D2),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 2,
+                              ),
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.lock_outline_rounded,
+                                    size: 20,
+                                    color: Colors.white,
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Change Password',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
                               onPressed: () => _showLogoutDialog(context),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.red.shade600,
@@ -202,10 +239,9 @@ class ProfileScreen extends StatelessWidget {
                 ),
               );
             },
-          );
-        },
-      ),
+          )
     );
+        }
   }
 
   Widget _buildInfoCard({
@@ -426,12 +462,21 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+  void _navigateToChangePassword(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ChangePasswordScreen()),
+    );
+  }
+
   void _showLogoutDialog(BuildContext context) {
   showDialog(
     context: context,
-    builder: (BuildContext context) {
+    builder: (BuildContext dialogContext) {
       return AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
         title: const Row(
           children: [
             Icon(Icons.logout_rounded, color: Colors.red),
@@ -442,18 +487,64 @@ class ProfileScreen extends StatelessWidget {
         content: const Text('Are you sure you want to logout?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel', style: TextStyle(color: Colors.grey.shade600)),
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: Colors.grey.shade600),
+            ),
           ),
           ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Provider.of<AuthProvider>(context, listen: false).logout(context);
+            onPressed: () async {
+              
+              Navigator.of(dialogContext).pop();
+              
+              final success = await Provider.of<AuthProvider>(
+                context,
+                listen: false,
+              ).logoutWithoutNavigation();
+              
+              if (success) {
+                
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (route) => false,
+                );
+                
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Row(
+                      children: [
+                        Icon(Icons.logout, color: Colors.white),
+                        SizedBox(width: 8),
+                        Text('Logged out successfully'),
+                      ],
+                    ),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              } else {
+                
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Row(
+                      children: [
+                        Icon(Icons.error, color: Colors.white),
+                        SizedBox(width: 8),
+                        Text('Logout failed. Please try again.'),
+                      ],
+                    ),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red.shade600,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             child: const Text('Logout'),
           ),
@@ -461,6 +552,4 @@ class ProfileScreen extends StatelessWidget {
       );
     },
   );
-}
-
 }

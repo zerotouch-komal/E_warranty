@@ -1,6 +1,6 @@
 import 'package:e_warranty/provider/login_provider.dart';
-import 'package:e_warranty/screens/change_password.dart';
-import 'package:e_warranty/screens/dashboard.dart';
+import 'package:e_warranty/retailer/screens/retailer_dashboard.dart';
+import 'package:e_warranty/screens/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -216,11 +216,20 @@ class _LoginScreenState extends State<LoginScreen>
 
       if (isSuccess) {
         _showSuccessMessage();
-        // Navigate to dashboard
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => DashboardScreen()),
-        );
+        
+        String? userType =
+            authProvider.user?['userType']?.toString().toUpperCase();
+        if (userType == 'RETAILER') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => RetailerDashboard()),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => MyDrawer()),
+          );
+        }
       } else {
         _showErrorMessage(
           authProvider.loginStatus ??
@@ -383,7 +392,6 @@ class _LoginScreenState extends State<LoginScreen>
                               //     ),
                               //   ],
                               // ),
-
                               const SizedBox(height: 32),
 
                               _buildButton(

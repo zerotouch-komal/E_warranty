@@ -1,8 +1,9 @@
 import 'dart:convert';
+import 'package:e_warranty/constants/config.dart';
 import 'package:http/http.dart' as http;
 
 Future<void> submitCustomerData(Map<String, dynamic> combinedData) async {
-  final url = Uri.parse('https://boxer-patient-slowly.ngrok-free.app/api/customers/create');
+  final url = Uri.parse('${baseUrl}/api/customers/create');
   final token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJVU0VSXzE3NTI1NTk4OTIwMDVfN2p4anI4czV6IiwiY29tcGFueUlkIjoiQ09NUEFOWV8xNzUyNTU4NDk2NTM1Xzk3bXJ1eGQ2OSIsInVzZXJUeXBlIjoiUkVUQUlMRVIiLCJpYXQiOjE3NTI3NTI5MjgsImV4cCI6MTc1MjgzOTMyOH0.otI98_H5g1LPhoO-XvHw0thnPa__Q0LUhsstaJbR8Lc";
 
   try {

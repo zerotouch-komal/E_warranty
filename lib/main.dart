@@ -1,3 +1,4 @@
+import 'package:e_warranty/provider/all_user_provider.dart';
 import 'package:e_warranty/provider/dashboard_provider.dart';
 import 'package:e_warranty/provider/key_provider.dart';
 import 'package:e_warranty/provider/login_provider.dart';
@@ -22,9 +23,13 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => DashboardProvider()..loadDashboardStats()),
-        ChangeNotifierProvider(create: (_) => KeyHistoryProvider()..getKeyHistory()),
+        ChangeNotifierProvider(create: (_) => DashboardProvider()),
+        ChangeNotifierProvider(create: (_) => KeyHistoryProvider()),
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => KeyTransferProvider()),
+        ChangeNotifierProvider(create: (_) => RegisterProvider()),
+
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

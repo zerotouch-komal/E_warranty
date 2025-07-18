@@ -1,7 +1,7 @@
+import 'package:e_warranty/screens/drawer.dart';
 import 'package:e_warranty/screens/login.dart';
 import 'package:flutter/material.dart';
 import 'package:e_warranty/utils/shared_preferences.dart';
-import 'package:e_warranty/screens/dashboard.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -56,22 +56,21 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _checkAuthStatus() async {
-    // Wait for splash screen animation to complete
+    
     await Future.delayed(const Duration(milliseconds: 2500));
     
-    // Check if user is logged in
     final isLoggedIn = await SharedPreferenceHelper.instance.getBool('KEYLOGIN') ?? false;
     final authToken = await SharedPreferenceHelper.instance.getString('auth_token');
     
     if (mounted) {
       if (isLoggedIn && authToken != null && authToken.isNotEmpty) {
-        // User is logged in, navigate to dashboard
+
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => DashboardScreen()),
+          MaterialPageRoute(builder: (context) => MyDrawer()),
         );
       } else {
-        // User is not logged in, navigate to login screen
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const LoginScreen()),
@@ -99,7 +98,7 @@ class _SplashScreenState extends State<SplashScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // App Logo/Icon
+                
                 Container(
                   width: 120,
                   height: 120,
@@ -127,7 +126,6 @@ class _SplashScreenState extends State<SplashScreen>
                 
                 const SizedBox(height: 40),
                 
-                // App Name
                 const Text(
                   'E-Warranty',
                   style: TextStyle(
@@ -140,7 +138,6 @@ class _SplashScreenState extends State<SplashScreen>
                 
                 const SizedBox(height: 16),
                 
-                // Subtitle
                 Text(
                   'Your Digital Warranty Solution',
                   style: TextStyle(
@@ -152,7 +149,6 @@ class _SplashScreenState extends State<SplashScreen>
                 
                 const SizedBox(height: 60),
                 
-                // Loading indicator
                 SizedBox(
                   width: 40,
                   height: 40,

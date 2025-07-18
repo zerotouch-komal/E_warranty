@@ -1,12 +1,31 @@
 import 'package:e_warranty/provider/key_provider.dart';
-import 'package:e_warranty/screens/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/key_history_model.dart';
 import 'package:intl/intl.dart';
 
-class KeyHistoryScreen extends StatelessWidget {
+class KeyHistoryScreen extends StatefulWidget {
   const KeyHistoryScreen({super.key});
+
+  @override
+  State<KeyHistoryScreen> createState() => _KeyHistoryScreenState();
+}
+
+class _KeyHistoryScreenState extends State<KeyHistoryScreen> {
+
+@override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<KeyHistoryProvider>(context, listen: false);
+      if (!provider.hasLoadedOnce) {
+        provider.getKeyHistory();
+      } else {
+        provider.refreshInBackground();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +51,10 @@ class KeyHistoryScreen extends StatelessWidget {
           ),
         ),
       ),
-      drawer: MyDrawer(currentRoute: '/key_history'),
+      
       body: Consumer<KeyHistoryProvider>(
         builder: (context, provider, child) {
-          if (provider.isLoading) {
+          if (provider.isLoading && !provider.hasLoadedOnce) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -98,7 +117,7 @@ class KeyHistoryScreen extends StatelessWidget {
 
           return RefreshIndicator(
             onRefresh: () async {
-              await Future.delayed(const Duration(seconds: 1));
+              await provider.getKeyHistory();
             },
             color: const Color(0xFF2563EB),
             child: ListView.builder(

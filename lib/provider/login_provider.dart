@@ -50,77 +50,63 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<bool> login(String email, String password) async {
-    _isLoading = true;
-    notifyListeners();
+  _isLoading = true;
+  notifyListeners();
 
-    try {
-      final loginResponse = await AuthService.login(email, password);
+  try {
+    final loginResponse = await AuthService.login(email, password);
 
-      if (loginResponse.success && loginResponse.data != null) {
-        _authToken = loginResponse.data!.token;
-        _refreshToken = loginResponse.data!.refreshToken;
-        _user = loginResponse.data!.user;
-        _isLoggedIn = true;
-        _loginStatus = null;
+    if (loginResponse.success && loginResponse.data != null) {
+      _authToken = loginResponse.data!.token;
+      _refreshToken = loginResponse.data!.refreshToken;
+      _user = loginResponse.data!.user;
+      _isLoggedIn = true;
+      _loginStatus = null;
 
-        await SharedPreferenceHelper.instance.setString(
-          'auth_token',
-          _authToken!,
-        );
-        await SharedPreferenceHelper.instance.setString(
-          'refresh_token',
-          _refreshToken!,
-        );
-        await SharedPreferenceHelper.instance.setBool('KEYLOGIN', true);
-        await SharedPreferenceHelper.instance.setString(
-          'userId',
-          _user!['userId'],
-        );
-        await SharedPreferenceHelper.instance.setString('name', _user!['name']);
-        await SharedPreferenceHelper.instance.setString(
-          'email',
-          _user!['email'],
-        );
-        await SharedPreferenceHelper.instance.setString(
-          'phone',
-          _user!['phone'],
-        );
-        await SharedPreferenceHelper.instance.setString(
-          'userType',
-          _user!['userType'],
-        );
-        await SharedPreferenceHelper.instance.setString(
-          'companyId',
-          _user!['companyId'],
-        );
-        await SharedPreferenceHelper.instance.setString(
-          'lastLoginAt',
-          _user!['lastLoginAt'],
-        );
+      String userType = _user!['userType'].toString().toUpperCase();
 
-        _isLoading = false;
-        notifyListeners();
-        return true;
+      if (userType == 'RETAILER') {
+
+        await SharedPreferenceHelper.instance.setString('retailer_auth_token', _authToken!);
+        await SharedPreferenceHelper.instance.setString('retailer_refresh_token', _refreshToken!);
+        await SharedPreferenceHelper.instance.setBool('retailer_KEYLOGIN', true);
+        await SharedPreferenceHelper.instance.setString('retailer_loginStatus', 'LoggedIn');
       } else {
-        _loginStatus = loginResponse.message;
-        await SharedPreferenceHelper.instance.setString(
-          "loginStatus",
-          _loginStatus!,
-        );
-
-        _isLoading = false;
-        notifyListeners();
-        return false;
+        
+        await SharedPreferenceHelper.instance.setString('auth_token', _authToken!);
+        await SharedPreferenceHelper.instance.setString('refresh_token', _refreshToken!);
+        await SharedPreferenceHelper.instance.setBool('KEYLOGIN', true);
+        await SharedPreferenceHelper.instance.setString('loginStatus', 'LoggedIn');
       }
-    } catch (e) {
-      print("Login error in provider: $e");
+
+      await SharedPreferenceHelper.instance.setString('userId', _user!['userId']);
+      await SharedPreferenceHelper.instance.setString('name', _user!['name']);
+      await SharedPreferenceHelper.instance.setString('email', _user!['email']);
+      await SharedPreferenceHelper.instance.setString('phone', _user!['phone']);
+      await SharedPreferenceHelper.instance.setString('userType', _user!['userType']);
+      await SharedPreferenceHelper.instance.setString('companyId', _user!['companyId']);
+      await SharedPreferenceHelper.instance.setString('lastLoginAt', _user!['lastLoginAt']);
+
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } else {
+      _loginStatus = loginResponse.message;
+      await SharedPreferenceHelper.instance.setString("loginStatus", _loginStatus!);
       _isLoading = false;
       notifyListeners();
       return false;
     }
+  } catch (e) {
+    print("Login error in provider: $e");
+    _isLoading = false;
+    notifyListeners();
+    return false;
   }
+}
 
-  Future<void> logout(BuildContext context) async {
+
+  Future<bool> logoutWithoutNavigation() async {
   _isLoading = true;
   notifyListeners();
 
@@ -128,7 +114,6 @@ class AuthProvider with ChangeNotifier {
     final success = await LogoutService.logoutFromApi();
 
     if (success) {
-      // Clear shared preferences
       await SharedPreferenceHelper.instance.remove('auth_token');
       await SharedPreferenceHelper.instance.remove('refresh_token');
       await SharedPreferenceHelper.instance.setBool('KEYLOGIN', false);
@@ -141,6 +126,11 @@ class AuthProvider with ChangeNotifier {
       await SharedPreferenceHelper.instance.remove('companyId');
       await SharedPreferenceHelper.instance.remove('lastLoginAt');
 
+      await SharedPreferenceHelper.instance.remove('retailer_auth_token');
+      await SharedPreferenceHelper.instance.remove('retailer_refresh_token');
+      await SharedPreferenceHelper.instance.setBool('retailer_KEYLOGIN', false);
+      await SharedPreferenceHelper.instance.remove('retailer_loginStatus');
+
       _isLoggedIn = false;
       _authToken = null;
       _refreshToken = null;
@@ -148,51 +138,46 @@ class AuthProvider with ChangeNotifier {
       _loginStatus = null;
 
       notifyListeners();
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
-          (route) => false,
-        );
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Row(
-              children: [
-                Icon(Icons.logout, color: Colors.white),
-                SizedBox(width: 8),
-                Text('Logged out successfully'),
-              ],
-            ),
-            backgroundColor: Colors.green,
-          ),
-        );
-      });
+      return true;
     } else {
-      throw Exception('Logout API failed');
+      return false;
     }
   } catch (e) {
     print('Logout error: $e');
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Row(
-            children: [
-              Icon(Icons.error, color: Colors.white),
-              SizedBox(width: 8),
-              Text('Logout failed. Please try again.'),
-            ],
-          ),
-          backgroundColor: Colors.red,
-        ),
-      );
-    });
+    return false;
   } finally {
     _isLoading = false;
     notifyListeners();
   }
+}
+
+Future<bool> logout(BuildContext context) async {
+  final success = await logoutWithoutNavigation();
+  
+  if (success && context.mounted) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        (route) => false,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.logout, color: Colors.white),
+              SizedBox(width: 8),
+              Text('Logged out successfully'),
+            ],
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+    });
+  }
+  
+  return success;
 }
 
 Future<void> changePassword({

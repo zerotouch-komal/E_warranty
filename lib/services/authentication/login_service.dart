@@ -2,9 +2,7 @@ import 'dart:convert';
 import 'package:e_warranty/constants/config.dart';
 import 'package:e_warranty/models/change_password_model.dart';
 import 'package:e_warranty/models/login_model.dart';
-import 'package:e_warranty/screens/login.dart';
 import 'package:e_warranty/utils/shared_preferences.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class AuthService {
