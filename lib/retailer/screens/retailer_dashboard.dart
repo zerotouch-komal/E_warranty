@@ -1,6 +1,10 @@
+import 'package:e_warranty/provider/login_provider.dart';
 import 'package:e_warranty/retailer/screens/retailer_add_customer.dart';
 import 'package:e_warranty/retailer/screens/retailer_drawer.dart';
+import 'package:e_warranty/screens/login.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../provider/profile_provider.dart';
 
 class EWarrantyApp extends StatelessWidget {
   @override
@@ -537,18 +541,63 @@ class _RetailerDashboardState extends State<RetailerDashboard> {
               child: Text('Cancel', style: TextStyle(color: Color(0xFF1565C0))),
             ),
             ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                // Handle logout logic here
+              onPressed: () async {
+                final navigator = Navigator.of(context);
+                final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+                navigator.pop(); // Close the dialog
+
+                final success =
+                    await Provider.of<AuthProvider>(
+                      context,
+                      listen: false,
+                    ).logoutWithoutNavigation();
+
+                if (!mounted) return;
+
+                if (success) {
+                  navigator.pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(),
+                    ),
+                    (route) => false,
+                  );
+
+                  scaffoldMessenger.showSnackBar(
+                    const SnackBar(
+                      content: Row(
+                        children: [
+                          Icon(Icons.logout, color: Colors.white),
+                          SizedBox(width: 8),
+                          Text('Logged out successfully'),
+                        ],
+                      ),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                } else {
+                  scaffoldMessenger.showSnackBar(
+                    const SnackBar(
+                      content: Row(
+                        children: [
+                          Icon(Icons.error, color: Colors.white),
+                          SizedBox(width: 8),
+                          Text('Logout failed. Please try again.'),
+                        ],
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF1565C0),
+                backgroundColor: Colors.red.shade600,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: Text('Logout'),
+              child: const Text('Logout'),
             ),
           ],
         );

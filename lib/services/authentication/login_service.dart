@@ -12,13 +12,8 @@ class AuthService {
 
       final response = await http.post(
         url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-        }),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'password': password}),
       );
 
       print('Login Response Code: ${response.statusCode}');
@@ -47,25 +42,34 @@ class AuthService {
 }
 
 // LOGOUT SERVICE
-
 class LogoutService {
   static Future<bool> logoutFromApi() async {
     final token = await SharedPreferenceHelper.instance.getString('auth_token');
+    final retailerToken = await SharedPreferenceHelper.instance.getString(
+      'retailer_auth_token',
+    );
 
-    if (token == null || token.isEmpty) {
+    if ((token == null || token.isEmpty) &&
+        (retailerToken == null || retailerToken.isEmpty)) {
       print('❌ No auth token found');
       return false;
     }
 
+    final usedToken = token != null && token.isNotEmpty ? token : retailerToken;
+
     final url = Uri.parse('${baseUrl}api/auth/logout');
     print('📡 Sending POST request to: $url');
-    print('🔐 Using token: $token');
+    print('🔐 Using token: $usedToken');
 
     final response = await http.post(
       url,
       headers: {
-        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $usedToken',
       },
+      body: jsonEncode({
+        'token': usedToken, // 👈 sending in body too
+      }),
     );
 
     print('📥 Status Code: ${response.statusCode}');
@@ -77,7 +81,7 @@ class LogoutService {
 
 // CHANGE PASSWORD
 
-class ChangePasswordService { 
+class ChangePasswordService {
   static Future<ChangePasswordResponse> changePassword({
     required String token,
     required String currentPassword,
