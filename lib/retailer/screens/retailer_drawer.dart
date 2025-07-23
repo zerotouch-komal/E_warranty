@@ -1,6 +1,7 @@
+import 'package:e_warranty/retailer/screens/retailer_dashboard.dart';
+import 'package:e_warranty/retailer/screens/retailer_history.dart';
 import 'package:flutter/material.dart';
 import 'retailer_profile_screen.dart';
-
 
 class CustomDrawer extends StatelessWidget {
   @override
@@ -16,7 +17,9 @@ class CustomDrawer extends StatelessWidget {
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.blue.withOpacity(0.1),
-                border: Border(bottom: BorderSide(color: Colors.blue.withOpacity(0.2))),
+                border: Border(
+                  bottom: BorderSide(color: Colors.blue.withOpacity(0.2)),
+                ),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -24,11 +27,7 @@ class CustomDrawer extends StatelessWidget {
                   CircleAvatar(
                     radius: 40,
                     backgroundColor: Colors.blue.withOpacity(0.2),
-                    child: Icon(
-                      Icons.store,
-                      size: 40,
-                      color: Colors.blue[700],
-                    ),
+                    child: Icon(Icons.store, size: 40, color: Colors.blue[700]),
                   ),
                   SizedBox(height: 12),
                   Text(
@@ -41,10 +40,7 @@ class CustomDrawer extends StatelessWidget {
                   ),
                   Text(
                     'Retailer Portal',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.blue[600],
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.blue[600]),
                   ),
                 ],
               ),
@@ -57,8 +53,14 @@ class CustomDrawer extends StatelessWidget {
                   _buildDrawerItem(
                     icon: Icons.dashboard,
                     title: 'Dashboard',
-                    onTap: () {
+                     onTap: () {
                       Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RetailerDashboard(),
+                        ),
+                      );
                     },
                   ),
                   _buildDrawerItem(
@@ -69,19 +71,19 @@ class CustomDrawer extends StatelessWidget {
                     },
                   ),
                   _buildDrawerItem(
-                    icon: Icons.history,
-                    title: 'Key History',
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  _buildDrawerItem(
                     icon: Icons.account_balance_wallet,
                     title: 'Transactions',
                     onTap: () {
                       Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HistoryData(),
+                        ),
+                      );
                     },
                   ),
+                
                   _buildDrawerItem(
                     icon: Icons.person,
                     title: 'My Profile',
@@ -89,7 +91,9 @@ class CustomDrawer extends StatelessWidget {
                       Navigator.pop(context);
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => ProfileScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => ProfileScreen(),
+                        ),
                       );
                     },
                   ),
@@ -111,10 +115,7 @@ class CustomDrawer extends StatelessWidget {
       leading: Icon(icon, color: Colors.blue[700]),
       title: Text(
         title,
-        style: TextStyle(
-          color: Colors.blue[800],
-          fontWeight: FontWeight.w500,
-        ),
+        style: TextStyle(color: Colors.blue[800], fontWeight: FontWeight.w500),
       ),
       onTap: onTap,
       hoverColor: Colors.blue.withOpacity(0.1),

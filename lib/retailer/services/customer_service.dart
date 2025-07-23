@@ -1,64 +1,90 @@
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:e_warranty/constants/config.dart';
-import 'package:e_warranty/retailer/models/customer_model.dart';
-import 'package:e_warranty/retailer/screens/retailer_view_customers.dart';
+import 'package:e_warranty/retailer/models/customer_details_model.dart';
+import 'package:e_warranty/retailer/models/customers_list_model.dart';
 import 'package:e_warranty/utils/shared_preferences.dart';
 
-import 'package:http/http.dart' as http;
+Future<Map<String, String>> _getAuthHeaders() async {
+  final token = await SharedPreferenceHelper.instance.getString(
+    'retailer_auth_token',
+  );
+  return {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'};
+}
 
 Future<void> submitCustomerData(Map<String, dynamic> combinedData) async {
-  final url = Uri.parse('${baseUrl}/api/customers/create');
-  final token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJVU0VSXzE3NTI1NTk4OTIwMDVfN2p4anI4czV6IiwiY29tcGFueUlkIjoiQ09NUEFOWV8xNzUyNTU4NDk2NTM1Xzk3bXJ1eGQ2OSIsInVzZXJUeXBlIjoiUkVUQUlMRVIiLCJpYXQiOjE3NTI3NTI5MjgsImV4cCI6MTc1MjgzOTMyOH0.otI98_H5g1LPhoO-XvHw0thnPa__Q0LUhsstaJbR8Lc";
+  final url = Uri.parse('${baseUrl}api/customers/create');
 
   try {
+    final headers = await _getAuthHeaders();
     final response = await http.post(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: headers,
       body: jsonEncode(combinedData),
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      print(' Data submitted successfully.');
-      print('Response: ${response.body}');
+      print('Customer data submitted successfully.');
     } else {
-      print(' Failed to submit. Status: ${response.statusCode}');
+      print('Failed to submit customer. Status: ${response.statusCode}');
       print('Response: ${response.body}');
     }
   } catch (e) {
-    print(' Error: $e');
+    print('Error submitting customer data: $e');
+    rethrow;
   }
 }
 
-
-Future<List<CustomerData>> fetchAllCustomers() async {
+Future<List<CustomersData>> fetchAllCustomers() async {
   final url = Uri.parse('${baseUrl}api/customers/all');
-  final token = await SharedPreferenceHelper.instance.getString(
-      'retailer_auth_token',
-    );
 
   try {
-    final response = await http.get(
+    final headers = await _getAuthHeaders();
+    final response = await http.post(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: headers,
+      body: jsonEncode({}),
     );
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final customers = data['data']['customers'] as List;
-      print('Customers fetched successfully.');
-      return customers.map((e) => CustomerData.fromJson(e)).toList();
+      final jsonData = jsonDecode(response.body);
+      final List customers = jsonData['data']['customers'];
+      return customers.map((e) => CustomersData.fromJson(e)).toList();
     } else {
-      print('Failed to fetch customers. Status: ${response.statusCode}');
-      throw Exception("Failed to fetch customers");
+      throw Exception(
+        'Failed to fetch customers. Status: ${response.statusCode}',
+      );
     }
   } catch (e) {
-    print('Error fetching customers data: $e');
-    throw Exception("Error: $e");
+    print('Error fetching all customers: $e');
+    rethrow;
+  }
+}
+
+Future<ParticularCustomerData> fetchCustomerDetails(String customerId) async {
+  final url = Uri.parse('${baseUrl}api/customers/get');
+
+  try {
+    final headers = await _getAuthHeaders();
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: jsonEncode({'customerId': customerId}),
+    );
+
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+      final customer = ParticularCustomerData.fromJson(
+        jsonData['data']['customer'],
+      );
+      return customer;
+    } else {
+      throw Exception(
+        'Failed to fetch customer. Status: ${response.statusCode}',
+      );
+    }
+  } catch (e) {
+    print('Error fetching particular customer: $e');
+    rethrow;
   }
 }

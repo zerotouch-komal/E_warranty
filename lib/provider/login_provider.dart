@@ -8,14 +8,12 @@ class AuthProvider with ChangeNotifier {
   bool _isLoading = false;
   bool _isLoggedIn = false;
   String? _authToken;
-  String? _refreshToken;
   String? _loginStatus;
   Map<String, dynamic>? _user;
 
   bool get isLoading => _isLoading;
   bool get isLoggedIn => _isLoggedIn;
   String? get authToken => _authToken;
-  String? get refreshToken => _refreshToken;
   String? get loginStatus => _loginStatus;
   Map<String, dynamic>? get user => _user;
 
@@ -29,9 +27,7 @@ class AuthProvider with ChangeNotifier {
       _authToken = await SharedPreferenceHelper.instance.getString(
         'auth_token',
       );
-      _refreshToken = await SharedPreferenceHelper.instance.getString(
-        'refresh_token',
-      );
+    
       _loginStatus = await SharedPreferenceHelper.instance.getString(
         'loginStatus',
       );
@@ -58,7 +54,6 @@ class AuthProvider with ChangeNotifier {
 
       if (loginResponse.success && loginResponse.data != null) {
         _authToken = loginResponse.data!.token;
-        _refreshToken = loginResponse.data!.refreshToken;
         _user = loginResponse.data!.user;
         _isLoggedIn = true;
         _loginStatus = null;
@@ -70,10 +65,7 @@ class AuthProvider with ChangeNotifier {
             'retailer_auth_token',
             _authToken!,
           );
-          await SharedPreferenceHelper.instance.setString(
-            'retailer_refresh_token',
-            _refreshToken!,
-          );
+        
           await SharedPreferenceHelper.instance.setBool(
             'retailer_KEYLOGIN',
             true,
@@ -87,10 +79,7 @@ class AuthProvider with ChangeNotifier {
             'auth_token',
             _authToken!,
           );
-          await SharedPreferenceHelper.instance.setString(
-            'refresh_token',
-            _refreshToken!,
-          );
+       
           await SharedPreferenceHelper.instance.setBool('KEYLOGIN', true);
           await SharedPreferenceHelper.instance.setString(
             'loginStatus',
@@ -150,40 +139,30 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final success = await LogoutService.logoutFromApi();
+      await LogoutService.logoutFromApi();
 
-      if (success) {
-        await SharedPreferenceHelper.instance.remove('auth_token');
-        await SharedPreferenceHelper.instance.remove('refresh_token');
-        await SharedPreferenceHelper.instance.setBool('KEYLOGIN', false);
-        await SharedPreferenceHelper.instance.remove('loginStatus');
-        await SharedPreferenceHelper.instance.remove('userId');
-        await SharedPreferenceHelper.instance.remove('name');
-        await SharedPreferenceHelper.instance.remove('email');
-        await SharedPreferenceHelper.instance.remove('phone');
-        await SharedPreferenceHelper.instance.remove('userType');
-        await SharedPreferenceHelper.instance.remove('companyId');
-        await SharedPreferenceHelper.instance.remove('lastLoginAt');
+      await SharedPreferenceHelper.instance.remove('auth_token');
+      await SharedPreferenceHelper.instance.setBool('KEYLOGIN', false);
+      await SharedPreferenceHelper.instance.remove('loginStatus');
+      await SharedPreferenceHelper.instance.remove('userId');
+      await SharedPreferenceHelper.instance.remove('name');
+      await SharedPreferenceHelper.instance.remove('email');
+      await SharedPreferenceHelper.instance.remove('phone');
+      await SharedPreferenceHelper.instance.remove('userType');
+      await SharedPreferenceHelper.instance.remove('companyId');
+      await SharedPreferenceHelper.instance.remove('lastLoginAt');
 
-        await SharedPreferenceHelper.instance.remove('retailer_auth_token');
-        await SharedPreferenceHelper.instance.remove('retailer_refresh_token');
-        await SharedPreferenceHelper.instance.setBool(
-          'retailer_KEYLOGIN',
-          false,
-        );
-        await SharedPreferenceHelper.instance.remove('retailer_loginStatus');
+      await SharedPreferenceHelper.instance.remove('retailer_auth_token');
+      await SharedPreferenceHelper.instance.setBool('retailer_KEYLOGIN', false);
+      await SharedPreferenceHelper.instance.remove('retailer_loginStatus');
 
-        _isLoggedIn = false;
-        _authToken = null;
-        _refreshToken = null;
-        _user = null;
-        _loginStatus = null;
+      _isLoggedIn = false;
+      _authToken = null;
+      _user = null;
+      _loginStatus = null;
 
-        notifyListeners();
-        return true;
-      } else {
-        return false;
-      }
+      notifyListeners();
+      return true;
     } catch (e) {
       print('Logout error: $e');
       return false;

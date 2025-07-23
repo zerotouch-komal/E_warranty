@@ -26,7 +26,7 @@ class AuthService {
         final responseData = jsonDecode(response.body);
         return LoginResponse(
           success: false,
-          message: responseData['message'] ?? 'Login failed',
+          message: responseData['message'] ?? 'Login failed. Please check your credentials.',
           data: null,
         );
       }
@@ -68,7 +68,7 @@ class LogoutService {
         'Authorization': 'Bearer $usedToken',
       },
       body: jsonEncode({
-        'token': usedToken, // 👈 sending in body too
+        'token': usedToken,
       }),
     );
 
