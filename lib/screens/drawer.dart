@@ -113,13 +113,13 @@ class _MyDrawerState extends State<MyDrawer> {
                 BottomNavigationBarItem(
                   icon: Padding(
                     padding: EdgeInsets.only(bottom: ScreenUtil.unitHeight * 5),
-                    child: Icon(Icons.vpn_key_outlined, size: ScreenUtil.unitHeight * 30),
+                    child: Icon(Icons.wallet_rounded, size: ScreenUtil.unitHeight * 30),
                   ),
                   activeIcon: Padding(
                     padding: EdgeInsets.only(bottom: ScreenUtil.unitHeight * 5),
-                    child: Icon(Icons.vpn_key_rounded, size: ScreenUtil.unitHeight * 30),
+                    child: Icon(Icons.wallet, size: ScreenUtil.unitHeight * 30),
                   ),
-                  label: 'Key History',
+                  label: 'Wallet History',
                 ),
                 BottomNavigationBarItem(
                   icon: Padding(

@@ -7,23 +7,30 @@ import 'package:e_warranty/utils/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class UserService {
-  Future<List<UserModel>> fetchAllUsers() async {
+  Future<List<UserModel>> fetchAllUsers({
+    int page = 1,
+    String userType = 'ALL',
+  }) async {
     final token = await SharedPreferenceHelper.instance.getString('auth_token');
 
     if (token == null || token.isEmpty) {
       throw Exception('No auth token found in SharedPreferences');
     }
 
-    final url = Uri.parse('${baseUrl}api/users/all');
-    print('📡 Sending GET request to: $url');
+    final url = Uri.parse('${baseUrl}api/users/get-all');
+    print('📡 Sending POST request to: $url');
     print('🔐 Using token: $token');
 
-    final response = await http.get(
+    final response = await http.post(
       url,
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
+      body: json.encode({
+        'userType': userType,
+        'page': page,
+      }),
     );
 
     print('📥 Status Code: ${response.statusCode}');
@@ -43,6 +50,7 @@ class UserService {
     }
   }
 }
+
 
 // GET SINGLE USER
 class UserDetailsService {

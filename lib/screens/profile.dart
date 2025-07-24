@@ -1,3 +1,4 @@
+import 'package:e_warranty/models/profile_model.dart';
 import 'package:e_warranty/provider/login_provider.dart';
 import 'package:e_warranty/screens/change_password.dart';
 import 'package:e_warranty/screens/login.dart';
@@ -39,7 +40,7 @@ class ProfileScreen extends StatelessWidget {
 
           final user = provider.user!;
           final companyAddress = user.company.address;
-          final userKeys = user.keyAllocation;
+          final userWallet = user.walletBalance;
 
           return SingleChildScrollView(
             child: Column(
@@ -154,7 +155,7 @@ class ProfileScreen extends StatelessWidget {
 
                       SizedBox(height: ScreenUtil.unitHeight * 20),
 
-                      _buildKeyAllocationCard(userKeys),
+                      _buildWalletCard(userWallet), // Changed from _buildKeyAllocationCard
 
                       SizedBox(height: ScreenUtil.unitHeight * 20),
 
@@ -316,10 +317,9 @@ Widget _buildInfoRow(IconData icon, String label, String value) {
   );
 }
 
-Widget _buildKeyAllocationCard(dynamic userKeys) {
-  final totalKeys = userKeys.remainingKeys + userKeys.usedKeys;
-  final remainingPercentage =
-      totalKeys > 0 ? (userKeys.remainingKeys / totalKeys) : 0.0;
+Widget _buildWalletCard(WalletBalance wallet) {
+  final totalAmount = wallet.totalAmount;
+  final remainingPercentage = totalAmount > 0 ? (wallet.remainingAmount / totalAmount) : 0.0;
 
   return Card(
     elevation: 2,
@@ -350,14 +350,14 @@ Widget _buildKeyAllocationCard(dynamic userKeys) {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
-                    Icons.vpn_key_rounded,
+                    Icons.account_balance_wallet_rounded,
                     color: Color(0xFF1976D2),
                     size: 20,
                   ),
                 ),
                 SizedBox(width: 12),
                 const Text(
-                  'Keys',
+                  'Wallet Balance',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -392,20 +392,19 @@ Widget _buildKeyAllocationCard(dynamic userKeys) {
 
             Row(
               children: [
-                SizedBox(width: ScreenUtil.unitHeight * 20),
                 Expanded(
-                  child: _buildKeyStatItem(
-                    'Keys',
-                    userKeys.remainingKeys.toString(),
-                    Icons.check_circle_rounded,
+                  child: _buildWalletStatItem(
+                    'Remaining',
+                    '₹${wallet.remainingAmount}',
+                    Icons.account_balance_wallet_rounded,
                     const Color(0xFF4CAF50),
                   ),
                 ),
                 SizedBox(width: ScreenUtil.unitHeight * 20),
                 Expanded(
-                  child: _buildKeyStatItem(
+                  child: _buildWalletStatItem(
                     'Used',
-                    userKeys.usedKeys.toString(),
+                    '₹${wallet.usedAmount}',
                     Icons.history_rounded,
                     const Color(0xFFFF9800),
                   ),
@@ -419,7 +418,7 @@ Widget _buildKeyAllocationCard(dynamic userKeys) {
   );
 }
 
-Widget _buildKeyStatItem(
+Widget _buildWalletStatItem(
   String label,
   String value,
   IconData icon,
@@ -439,10 +438,11 @@ Widget _buildKeyStatItem(
         Text(
           value,
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
             color: color,
           ),
+          textAlign: TextAlign.center,
         ),
         SizedBox(height: ScreenUtil.unitHeight * 10),
         Text(

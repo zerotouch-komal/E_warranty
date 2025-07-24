@@ -82,15 +82,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final provider = Provider.of<RegisterProvider>(context);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
           "Add User",
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
         ),
-        backgroundColor: colorScheme.surface,
+        backgroundColor: Colors.white,
         foregroundColor: colorScheme.onSurface,
         elevation: 0,
       ),
@@ -244,7 +243,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     provider.isLoading
                         ? Container(
                           decoration: BoxDecoration(
-                            color: colorScheme.primary.withOpacity(0.1),
+                            color: Colors.blue.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Center(
@@ -254,7 +253,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  colorScheme.primary,
+                                  Colors.blue,
                                 ),
                               ),
                             ),
@@ -263,8 +262,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         : ElevatedButton(
                           onPressed: _handleRegister,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: colorScheme.primary,
-                            foregroundColor: colorScheme.onPrimary,
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -292,7 +291,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     return Row(
       children: [
-        Icon(icon, size: 20, color: colorScheme.primary),
+        Icon(icon, size: 20, color: Colors.blue),
         SizedBox(width: 8),
         Text(
           title,
@@ -336,15 +335,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
           suffixIcon: suffixIcon,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: colorScheme.outline.withOpacity(0.3)),
+            borderSide: BorderSide(color: Colors.black.withOpacity(0.3)),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: colorScheme.outline.withOpacity(0.3)),
+            borderSide: BorderSide(color: Colors.black.withOpacity(0.3)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: colorScheme.primary, width: 2),
+            borderSide: BorderSide(color: Colors.blue, width: 2),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -355,7 +354,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             borderSide: BorderSide(color: colorScheme.error, width: 2),
           ),
           filled: true,
-          fillColor: colorScheme.surface,
+          fillColor: Colors.white,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
             vertical: 16,
@@ -394,22 +393,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: colorScheme.outline.withOpacity(0.3)),
+            borderSide: BorderSide(color: Colors.black.withOpacity(0.3)),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: colorScheme.outline.withOpacity(0.3)),
+            borderSide: BorderSide(color: Colors.black.withOpacity(0.3)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: colorScheme.primary, width: 2),
+            borderSide: BorderSide(color: Colors.blue, width: 2),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: colorScheme.error),
           ),
           filled: true,
-          fillColor: colorScheme.surface,
+          fillColor: Colors.white,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
             vertical: 16,
