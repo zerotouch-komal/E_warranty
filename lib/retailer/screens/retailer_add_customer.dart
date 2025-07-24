@@ -8,7 +8,7 @@ class CustomerStepperForm extends StatefulWidget {
   @override
   _CustomerStepperFormState createState() => _CustomerStepperFormState();
 }
-
+ 
 class _CustomerStepperFormState extends State<CustomerStepperForm> {
   int _currentStep = 0;
   final _formKeys = List.generate(6, (_) => GlobalKey<FormState>());

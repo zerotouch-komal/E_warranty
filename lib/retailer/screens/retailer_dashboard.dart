@@ -1,6 +1,7 @@
 import 'package:e_warranty/provider/login_provider.dart';
 import 'package:e_warranty/retailer/models/dashboard_model.dart';
 import 'package:e_warranty/retailer/screens/retailer_add_customer.dart';
+import 'package:e_warranty/retailer/screens/retailer_customer_details.dart';
 import 'package:e_warranty/retailer/screens/retailer_drawer.dart';
 import 'package:e_warranty/retailer/screens/retailer_customers_list.dart';
 import 'package:e_warranty/retailer/services/dashboard_service.dart';
@@ -151,7 +152,7 @@ class _RetailerDashboardState extends State<RetailerDashboard> {
           SizedBox(height: 16),
 
           _buildEWarrantyStatsSection(context, data.eWarrantyStats, isTablet),
-          SizedBox(height: 16),
+          SizedBox(height: 8),
 
           // Customer Count Section
           _buildCustomerCountSection(
@@ -159,7 +160,8 @@ class _RetailerDashboardState extends State<RetailerDashboard> {
             data.totalCustomersCount,
             isTablet,
           ),
-          SizedBox(height: 24),
+          
+          SizedBox(height: 20),
 
           _buildActionButtons(),
 
@@ -534,29 +536,29 @@ class _RetailerDashboardState extends State<RetailerDashboard> {
   ) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(20),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.grey.shade200, width: 1),
-
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: Offset(0, 4),
+            color: Colors.grey.withOpacity(0.08),
+            spreadRadius: 1,
+            blurRadius: 8,
+            offset: Offset(0, 2),
           ),
         ],
       ),
       child: Row(
         children: [
           Container(
-            padding: EdgeInsets.all(16),
+            padding: EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: Colors.purple.shade50,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(Icons.people, size: 32, color: Colors.purple.shade600),
+            child: Icon(Icons.people, size: 24, color: Colors.purple.shade600),
           ),
           SizedBox(width: 16),
           Expanded(
@@ -566,7 +568,7 @@ class _RetailerDashboardState extends State<RetailerDashboard> {
                 Text(
                   totalCustomers.toString(),
                   style: TextStyle(
-                    fontSize: isTablet ? 28 : 24,
+                    fontSize: isTablet ? 20 : 16,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF0D47A1),
                   ),
@@ -661,159 +663,175 @@ class _RetailerDashboardState extends State<RetailerDashboard> {
     final premiumAmount =
         customer.premiumAmount is int ? customer.premiumAmount as int : 0;
 
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 8,
-            offset: Offset(0, 2),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ViewCustomer(customerId: customer.customerId),
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Color(0xFFE3F2FD),
-                  borderRadius: BorderRadius.circular(8),
+        );
+      },
+      child: Container(
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade200, width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 8,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Color(0xFFE3F2FD),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(Icons.person, size: 20, color: Color(0xFF1565C0)),
                 ),
-                child: Icon(Icons.person, size: 20, color: Color(0xFF1565C0)),
-              ),
-              SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      customer.customerName.isNotEmpty
-                          ? customer.customerName
-                          : 'Unknown Customer',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF0D47A1),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        customer.customerName.isNotEmpty
+                            ? customer.customerName
+                            : 'Unknown Customer',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF0D47A1),
+                        ),
                       ),
+                      SizedBox(height: 2),
+                      Text(
+                        customer.warrantyKey,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                          fontFamily: 'monospace',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildInfoChip(
+                    Icons.category,
+                    customer.category.isNotEmpty ? customer.category : 'N/A',
+                    Colors.blue.shade50,
+                    Colors.blue.shade600,
+                  ),
+                ),
+                SizedBox(width: 8),
+                Expanded(
+                  child: _buildInfoChip(
+                    Icons.devices,
+                    customer.modelName.isNotEmpty ? customer.modelName : 'N/A',
+                    Colors.orange.shade50,
+                    Colors.orange.shade600,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 8),
+            Row(
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.access_time,
+                      size: 14,
+                      color: Colors.grey.shade500,
                     ),
-                    SizedBox(height: 2),
+                    SizedBox(width: 4),
                     Text(
-                      customer.warrantyKey,
+                      formattedDate,
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey.shade600,
-                        fontFamily: 'monospace',
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildInfoChip(
-                  Icons.category,
-                  customer.category.isNotEmpty ? customer.category : 'N/A',
-                  Colors.blue.shade50,
-                  Colors.blue.shade600,
-                ),
-              ),
-              SizedBox(width: 8),
-              Expanded(
-                child: _buildInfoChip(
-                  Icons.devices,
-                  customer.modelName.isNotEmpty ? customer.modelName : 'N/A',
-                  Colors.orange.shade50,
-                  Colors.orange.shade600,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 8),
-          Row(
-            children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.access_time,
-                    size: 14,
-                    color: Colors.grey.shade500,
-                  ),
-                  SizedBox(width: 4),
-                  Text(
-                    formattedDate,
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                  ),
-                ],
-              ),
-              Spacer(), // pushes the amount to the right
-              if (premiumAmount > 0)
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade50,
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: Colors.green.shade200, width: 1),
-                  ),
-                  child: Text(
-                    '₹${_formatAmount(premiumAmount)}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green.shade700,
+                Spacer(), // pushes the amount to the right
+                if (premiumAmount > 0)
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade50,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: Colors.green.shade200,
+                        width: 1,
+                      ),
                     ),
-                  ),
-                ),
-            ],
-          ),
-          SizedBox(height: 8),
-
-          Row(
-            children: [
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                child: Row(
-                  children: [
-                    Text(
-                      "Notes: ",
+                    child: Text(
+                      '₹${_formatAmount(premiumAmount)}',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: Colors.green.shade700,
                       ),
                     ),
-                    SizedBox(width: 4),
-                    SizedBox(
-                      width: 200, // adjust as needed
-                      child: Text(
-                        customer.notes?.isNotEmpty == true
-                            ? customer.notes!
-                            : "n/a",
+                  ),
+              ],
+            ),
+            SizedBox(height: 8),
+
+            Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  child: Row(
+                    children: [
+                      Text(
+                        "Notes: ",
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: Colors.lightGreen.shade700,
+                          color: Colors.black87,
                         ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
                       ),
-                    ),
-                  ],
+                      SizedBox(width: 4),
+                      SizedBox(
+                        width: 200, // adjust as needed
+                        child: Text(
+                          customer.notes?.isNotEmpty == true
+                              ? customer.notes!
+                              : "n/a",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.lightGreen.shade700,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

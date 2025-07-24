@@ -78,6 +78,7 @@ class EWarrantyStats {
 }
 
 class Customer {
+  final String customerId;
   final String customerName;
   final String modelName;
   final String warrantyPeriod;
@@ -89,6 +90,7 @@ class Customer {
   final String? notes;
 
   Customer({
+    required this.customerId,
     required this.customerName,
     required this.modelName,
     required this.warrantyPeriod,
@@ -102,6 +104,7 @@ class Customer {
 
   factory Customer.fromJson(Map<String, dynamic> json) {
     return Customer(
+      customerId: json['customerId'] ?? '',
       customerName: json['customerName'] ?? '',
       modelName: json['modelName'] ?? '',
       warrantyPeriod: json['warrantyPeriod'] ?? '',
