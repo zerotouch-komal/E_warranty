@@ -4,7 +4,6 @@ class ParticularCustomerData {
   final InvoiceDetails invoiceDetails;
   final ProductImages productImages;
   final WarrantyDetails warrantyDetails;
-  final PaymentDetails paymentDetails;
   final CustomerDates dates;
   final String id;
   final String customerId;
@@ -21,7 +20,6 @@ class ParticularCustomerData {
     required this.invoiceDetails,
     required this.productImages,
     required this.warrantyDetails,
-    required this.paymentDetails,
     required this.dates,
     required this.id,
     required this.customerId,
@@ -40,7 +38,6 @@ class ParticularCustomerData {
       invoiceDetails: InvoiceDetails.fromJson(json['invoiceDetails']),
       productImages: ProductImages.fromJson(json['productImages']),
       warrantyDetails: WarrantyDetails.fromJson(json['warrantyDetails']),
-      paymentDetails: PaymentDetails.fromJson(json['paymentDetails']),
       dates: CustomerDates.fromJson(json['dates']),
       id: json['_id'] ?? '',
       customerId: json['customerId'] ?? '',
@@ -207,38 +204,6 @@ class WarrantyDetails {
   }
 }
 
-class PaymentDetails {
-  final String paymentStatus;
-  final DateTime paymentDate;
-  final String paymentMethod;
-  final String orderId;
-  final String paymentOrderId;
-  final String paymentId;
-  final String transactionId;
-
-  PaymentDetails({
-    required this.paymentStatus,
-    required this.paymentDate,
-    required this.paymentMethod,
-    required this.orderId,
-    required this.paymentOrderId,
-    required this.paymentId,
-    required this.transactionId,
-  });
-
-  factory PaymentDetails.fromJson(Map<String, dynamic> json) {
-    return PaymentDetails(
-      paymentStatus: json['paymentStatus'] ?? '',
-      paymentDate: DateTime.parse(json['paymentDate']),
-      paymentMethod: json['paymentMethod'] ?? '',
-      orderId: json['orderId'] ?? '',
-      paymentOrderId: json['paymentOrderId'] ?? '',
-      paymentId: json['paymentId'] ?? '',
-      transactionId: json['transactionId'] ?? '',
-    );
-  }
-}
-
 class CustomerDates {
   final DateTime? pickedDate;
   final DateTime createdDate;
@@ -252,9 +217,10 @@ class CustomerDates {
 
   factory CustomerDates.fromJson(Map<String, dynamic> json) {
     return CustomerDates(
-      pickedDate: json['pickedDate'] != null
-          ? DateTime.tryParse(json['pickedDate'])
-          : null,
+      pickedDate:
+          json['pickedDate'] != null
+              ? DateTime.tryParse(json['pickedDate'])
+              : null,
       createdDate: DateTime.parse(json['createdDate']),
       lastModifiedDate: DateTime.parse(json['lastModifiedDate']),
     );

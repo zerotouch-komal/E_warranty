@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:e_warranty/retailer/models/warranty_plans_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:e_warranty/constants/config.dart';
 import 'package:e_warranty/retailer/models/customer_details_model.dart';
@@ -11,8 +12,7 @@ Future<Map<String, String>> _getAuthHeaders() async {
   );
   return {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'};
 }
-
-Future<void> submitCustomerData(Map<String, dynamic> combinedData) async {
+Future<http.Response> submitCustomerData(Map<String, dynamic> combinedData) async {
   final url = Uri.parse('${baseUrl}api/customers/create');
 
   try {
@@ -23,17 +23,41 @@ Future<void> submitCustomerData(Map<String, dynamic> combinedData) async {
       body: jsonEncode(combinedData),
     );
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      print('Customer data submitted successfully.');
-    } else {
-      print('Failed to submit customer. Status: ${response.statusCode}');
-      print('Response: ${response.body}');
-    }
+    print('Response (${response.statusCode}): ${response.body}');
+    return response;
   } catch (e) {
     print('Error submitting customer data: $e');
     rethrow;
   }
 }
+
+
+Future<List<WarrantyPlans>> fetchWarrantyPlans() async {
+  final url = Uri.parse('${baseUrl}api/warranty-plans/all');
+
+  try {
+    final headers = await _getAuthHeaders();
+    final response = await http.get(
+      url,
+      headers: headers,
+    );
+
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+      final List plans = jsonData['data']['plans'];
+      print("plans : $plans");
+      return plans.map((e) => WarrantyPlans.fromJson(e)).toList();
+    } else {
+      throw Exception(
+        'Failed to fetch warrranty plans. Status: ${response.statusCode}',
+      );
+    }
+  } catch (e) {
+    print('Error fetching warrranty : $e');
+    rethrow;
+  }
+}
+
 
 Future<List<CustomersData>> fetchAllCustomers() async {
   final url = Uri.parse('${baseUrl}api/customers/all');

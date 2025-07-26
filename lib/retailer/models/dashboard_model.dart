@@ -81,7 +81,7 @@ class Customer {
   final String customerId;
   final String customerName;
   final String modelName;
-  final String warrantyPeriod;
+  final int warrantyPeriod;
   final dynamic premiumAmount;
   final DateTime createdDate;
   final String warrantyKey;

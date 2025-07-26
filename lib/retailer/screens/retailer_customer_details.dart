@@ -84,8 +84,6 @@ class _ViewCustomerState extends State<ViewCustomer> {
                   const SizedBox(height: 20),
                   _buildWarrantyDetailsSection(customer.warrantyDetails),
                   const SizedBox(height: 20),
-                  _buildPaymentDetailsSection(customer.paymentDetails),
-                  const SizedBox(height: 20),
                   _buildAdditionalInfoSection(customer),
                   const SizedBox(height: 20),
                   _buildDatesSection(customer.dates),
@@ -507,99 +505,7 @@ class _ViewCustomerState extends State<ViewCustomer> {
     );
   }
 
-  Widget _buildPaymentDetailsSection(PaymentDetails details) {
-    Color statusColor = Colors.grey;
-    if (details.paymentStatus.toLowerCase() == 'completed' ||
-        details.paymentStatus.toLowerCase() == 'success') {
-      statusColor = Colors.green;
-    } else if (details.paymentStatus.toLowerCase() == 'failed') {
-      statusColor = Colors.red;
-    } else if (details.paymentStatus.toLowerCase() == 'pending') {
-      statusColor = Colors.orange;
-    }
 
-    return _buildSectionCard(
-      title: 'Payment Information',
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Icon(Icons.payment_outlined, size: 20, color: Colors.grey[600]),
-              const SizedBox(width: 12),
-              Expanded(
-                flex: 2,
-                child: Text(
-                  'Payment Status',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[700],
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 3,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: statusColor.withOpacity(0.3)),
-                  ),
-                  child: Text(
-                    details.paymentStatus.isEmpty
-                        ? 'Unknown'
-                        : details.paymentStatus,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: statusColor,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          _buildInfoRow(
-            label: 'Payment Date',
-            value: _formatDate(details.paymentDate),
-            icon: Icons.calendar_today_outlined,
-          ),
-          _buildInfoRow(
-            label: 'Payment Method',
-            value: details.paymentMethod,
-            icon: Icons.credit_card_outlined,
-          ),
-          _buildInfoRow(
-            label: 'Order ID',
-            value: details.orderId,
-            icon: Icons.shopping_bag_outlined,
-          ),
-          _buildInfoRow(
-            label: 'Payment Order ID',
-            value: details.paymentOrderId,
-            icon: Icons.receipt_long_outlined,
-          ),
-          _buildInfoRow(
-            label: 'Payment ID',
-            value: details.paymentId,
-            icon: Icons.payment_outlined,
-          ),
-          _buildInfoRow(
-            label: 'Transaction ID',
-            value: details.transactionId,
-            icon: Icons.swap_horiz_outlined,
-          ),
-        ],
-      ),
-      borderColor: Colors.purple[600],
-    );
-  }
 
   Widget _buildAdditionalInfoSection(ParticularCustomerData customer) {
     return _buildSectionCard(

@@ -1,6 +1,5 @@
 import 'package:e_warranty/retailer/screens/retailer_dashboard.dart';
 import 'package:e_warranty/retailer/screens/retailer_history.dart';
-import 'package:e_warranty/screens/profile.dart';
 import 'package:flutter/material.dart';
 import 'retailer_profile.dart';
 
@@ -38,10 +37,6 @@ class CustomDrawer extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       color: Colors.blue[800],
                     ),
-                  ),
-                  Text(
-                    'Retailer Portal',
-                    style: TextStyle(fontSize: 14, color: Colors.blue[600]),
                   ),
                 ],
               ),
@@ -93,7 +88,7 @@ class CustomDrawer extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ProfileScreen(),
+                          builder: (context) => RetailerProfileScreen(),
                         ),
                       );
                     },

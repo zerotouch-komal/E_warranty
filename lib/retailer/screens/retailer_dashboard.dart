@@ -151,6 +151,9 @@ class _RetailerDashboardState extends State<RetailerDashboard> {
           _buildWalletSection(context, data.walletBalance, isTablet),
           SizedBox(height: 16),
 
+          _buildActionButtons(),
+          SizedBox(height: 16),
+
           _buildEWarrantyStatsSection(context, data.eWarrantyStats, isTablet),
           SizedBox(height: 8),
 
@@ -161,9 +164,7 @@ class _RetailerDashboardState extends State<RetailerDashboard> {
             isTablet,
           ),
           
-          SizedBox(height: 20),
-
-          _buildActionButtons(),
+      
 
           SizedBox(height: 24),
 
@@ -439,7 +440,7 @@ class _RetailerDashboardState extends State<RetailerDashboard> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => CustomerStepperForm(),
+                      builder: (context) => CustomerForm(),
                     ),
                   );
                 },

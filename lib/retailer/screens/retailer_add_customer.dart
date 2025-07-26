@@ -1,660 +1,1014 @@
+import 'package:e_warranty/retailer/models/warranty_plans_model.dart';
 import 'package:e_warranty/retailer/services/customer_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:io';
 
-class CustomerStepperForm extends StatefulWidget {
+// Main Form Controller
+class CustomerForm extends StatefulWidget {
   @override
-  _CustomerStepperFormState createState() => _CustomerStepperFormState();
+  _CustomerFormState createState() => _CustomerFormState();
 }
- 
-class _CustomerStepperFormState extends State<CustomerStepperForm> {
-  int _currentStep = 0;
-  final _formKeys = List.generate(6, (_) => GlobalKey<FormState>());
 
-  // Data holders
-  final customerData = {
-    "name": "",
-    "email": "",
-    "mobile": "",
-    "alternateNumber": "",
-    "street": "",
-    "city": "",
-    "state": "",
-    "country": "",
-    "zipCode": "",
-  };
-
-  final productData = {
-    "modelName": "",
-    "imei1": "",
-    "imei2": "",
-    "brand": "",
-    "category": "",
-    "purchasePrice": "",
-  };
-
-  final Map<String, dynamic> invoiceData = {
-    "invoiceNumber": "",
-    "invoiceAmount": "",
-    "invoiceImage": "",
-    "invoiceDate": DateTime.now(),
-  };
-
-  final Map<String, dynamic> productImagesData = {
-    "frontImage": "",
-    "backImage": "",
-    "additionalImages": <String>[],
-  };
-
-  final Map<String, dynamic> warrantyData = {
-    "planId": "",
-    "planName": "",
-    "warrantyPeriod": "",
-    "startDate": DateTime.now(),
-    "expiryDate": DateTime.now(),
-    "premiumAmount": "",
-  };
-
-  final Map<String, dynamic> paymentData = {
-    "paymentStatus": "PENDING",
-    "paymentDate": DateTime.now(),
-    "paymentMethod": "",
-    "paymentOrderId": "",
-    "paymentId": "",
-    "transactionId": "",
-  };
-
-  // Controllers for additional images
-  List<TextEditingController> additionalImageControllers = [
-    TextEditingController(),
-  ];
+class _CustomerFormState extends State<CustomerForm> {
+    late Future<List<WarrantyPlans>> _warrantyPlans;
 
   @override
-  void dispose() {
-    for (var controller in additionalImageControllers) {
-      controller.dispose();
-    }
-    super.dispose();
+  void initState() {
+    super.initState();
+    _warrantyPlans = fetchWarrantyPlans();
   }
 
-  void _continue() {
-    if (_formKeys[_currentStep].currentState!.validate()) {
-      _formKeys[_currentStep].currentState!.save();
+  int _currentPage = 0;
+  final PageController _pageController = PageController();
 
-      // Save additional images data
-      if (_currentStep == 3) {
-        productImagesData["additionalImages"] =
-            additionalImageControllers
-                .map((controller) => controller.text)
-                .where((text) => text.isNotEmpty)
-                .toList();
-      }
+  static final Map<String, dynamic> _formData = {
+    'customer': <String, String>{},
+    'product': <String, String>{},
+    'invoice': <String, dynamic>{
+      'invoiceDate': DateTime.now(),
+      'invoiceImage': null,
+    },
+    'images': <String, dynamic>{
+      'frontImage': null, 
+      'backImage': null, 
+      'additionalImages': <String>[], 
+    },
+    'warranty': <String, dynamic>{
+      'startDate': DateTime.now(),
+      'expiryDate': DateTime.now(),
+    },
+  };
 
-      if (_currentStep < 5) {
-        setState(() => _currentStep++);
-      } else {
-        _submitData();
-      }
-    }
-  }
-
-  void _cancel() {
-    if (_currentStep > 0) {
-      setState(() => _currentStep--);
-    }
-  }
-
-  void _submitData() async{
-    final combinedData = {
-      "customerDetails": {
-        "name": customerData["name"],
-        "email": customerData["email"],
-        "mobile": customerData["mobile"],
-        "alternateNumber": customerData["alternateNumber"],
-        "address": {
-          "street": customerData["street"],
-          "city": customerData["city"],
-          "state": customerData["state"],
-          "country": customerData["country"],
-          "zipCode": customerData["zipCode"],
-        },
-      },
-      "productDetails": {
-        "modelName": productData["modelName"],
-        "imei1": productData["imei1"],
-        "imei2": productData["imei2"],
-        "brand": productData["brand"],
-        "category": productData["category"],
-        "purchasePrice":
-            double.tryParse(productData["purchasePrice"] ?? '') ?? 0,
-      },
-      "invoiceDetails": {
-        "invoiceNumber": invoiceData["invoiceNumber"],
-        "invoiceAmount": double.tryParse(invoiceData["invoiceAmount"]) ?? 0,
-        "invoiceImage": invoiceData["invoiceImage"],
-        "invoiceDate": DateFormat(
-          'yyyy-MM-dd',
-        ).format(invoiceData["invoiceDate"] as DateTime),
-      },
-      "productImages": {
-        "frontImage": productImagesData["frontImage"],
-        "backImage": productImagesData["backImage"],
-        "additionalImages": productImagesData["additionalImages"],
-      },
-      "warrantyDetails": {
-        "planId": warrantyData["planId"],
-        "planName": warrantyData["planName"],
-        "warrantyPeriod": int.tryParse(warrantyData["warrantyPeriod"]) ?? 0,
-        "startDate": DateFormat(
-          'yyyy-MM-dd',
-        ).format(warrantyData["startDate"] as DateTime),
-        "expiryDate": DateFormat(
-          'yyyy-MM-dd',
-        ).format(warrantyData["expiryDate"] as DateTime),
-        "premiumAmount": double.tryParse(warrantyData["premiumAmount"]) ?? 0,
-      },
-      "paymentDetails": {
-        "paymentStatus": paymentData["paymentStatus"],
-        "paymentDate": DateFormat(
-          'yyyy-MM-dd',
-        ).format(paymentData["paymentDate"] as DateTime),
-        "paymentMethod": paymentData["paymentMethod"],
-        "paymentOrderId": paymentData["paymentOrderId"],
-        "paymentId": paymentData["paymentId"],
-        "transactionId": paymentData["transactionId"],
-      },
-    };
-
-    print('=== COMPLETE FORM DATA ===');
-    print(const JsonEncoder.withIndent('  ').convert(combinedData));
-    print('=== END OF DATA ===');
-
-    await submitCustomerData(combinedData);
-
-    // Show success dialog
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Success!'),
-            content: const Text(
-              'Form submitted successfully. Check console for complete data.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-    );
-  }
-
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) return 'Email is required';
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(value)) return 'Please enter a valid email';
-    return null;
-  }
-
-  String? _validateMobile(String? value) {
-    if (value == null || value.isEmpty) return 'Mobile number is required';
-    if (value.length != 10) return 'Mobile number must be 10 digits';
-    if (!RegExp(r'^[0-9]+$').hasMatch(value))
-      return 'Mobile number must contain only digits';
-    return null;
-  }
-
-  String? _validateRequired(String? value, String fieldName) {
-    if (value == null || value.isEmpty) return '$fieldName is required';
-    return null;
-  }
-
-  String? _validateNumber(String? value, String fieldName) {
-    if (value == null || value.isEmpty) return '$fieldName is required';
-    if (double.tryParse(value) == null) return 'Please enter a valid number';
-    return null;
-  }
-
-  Widget _buildTextField(
-    String label,
-    String key,
-    Map<String, dynamic> data, {
-    TextInputType type = TextInputType.text,
-    String? Function(String?)? validator,
-    List<TextInputFormatter>? inputFormatters,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextFormField(
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(),
-        ),
-        keyboardType: type,
-        inputFormatters: inputFormatters,
-        validator:
-            validator ??
-            (val) => val == null || val.isEmpty ? '$label is required' : null,
-        onSaved: (val) => data[key] = val!,
-      ),
-    );
-  }
-
-  Widget _buildDatePicker(String label, String key, Map<String, dynamic> data) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: InkWell(
-        onTap: () async {
-          DateTime? picked = await showDatePicker(
-            context: context,
-            initialDate: data[key] as DateTime,
-            firstDate: DateTime(2000),
-            lastDate: DateTime(2100),
-          );
-          if (picked != null) {
-            setState(() => data[key] = picked);
-          }
-        },
-        child: InputDecorator(
-          decoration: InputDecoration(
-            labelText: label,
-            border: OutlineInputBorder(),
-            suffixIcon: Icon(Icons.calendar_today),
-          ),
-          child: Text(DateFormat('yyyy-MM-dd').format(data[key] as DateTime)),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPaymentStatusDropdown() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: DropdownButtonFormField<String>(
-        value: paymentData["paymentStatus"],
-        decoration: const InputDecoration(
-          labelText: 'Payment Status',
-          border: OutlineInputBorder(),
-        ),
-        items:
-            ['PENDING', 'PAID', 'FAILED', 'REFUNDED'].map((status) {
-              return DropdownMenuItem(value: status, child: Text(status));
-            }).toList(),
-        onChanged: (value) {
-          setState(() {
-            paymentData["paymentStatus"] = value!;
-          });
-        },
-      ),
-    );
-  }
-
-  Widget _buildAdditionalImagesSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Additional Images',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
-        ...additionalImageControllers.asMap().entries.map((entry) {
-          int index = entry.key;
-          TextEditingController controller = entry.value;
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: controller,
-                    decoration: InputDecoration(
-                      labelText: 'Additional Image URL ${index + 1}',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.remove_circle, color: Colors.red),
-                  onPressed: () {
-                    setState(() {
-                      additionalImageControllers.removeAt(index);
-                    });
-                  },
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-        const SizedBox(height: 8),
-        ElevatedButton.icon(
-          onPressed: () {
-            setState(() {
-              additionalImageControllers.add(TextEditingController());
-            });
-          },
-          icon: const Icon(Icons.add, size: 20),
-          label: const Text('Add More Images'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey.shade500, // dark neutral tone
-            foregroundColor: Colors.white, // white text/icon
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20.0,
-              vertical: 10.0,
-            ),
-            textStyle: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            elevation: 3,
-          ),
-        ),
-        const SizedBox(height: 8),
-      
-      ],
-    );
-  }
+  final List<String> _pageTitles = [
+    'Product Details',
+    'Customer Info',
+    'Invoice Details',
+    'Product Images',
+    'Warranty Info',
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Customer Stepper Form'),
-        backgroundColor: Colors.blue,
+        title: Text(_pageTitles[_currentPage]),
+        backgroundColor: Colors.blue[700],
         foregroundColor: Colors.white,
+        elevation: 1,
       ),
-      body: Stepper(
-        type: StepperType.vertical,
-        currentStep: _currentStep,
-        onStepContinue: _continue,
-        onStepCancel: _cancel,
-        onStepTapped: (step) => setState(() => _currentStep = step),
-        controlsBuilder: (context, details) {
-          return Row(
-            children: [
-              if (details.stepIndex < 5)
-                ElevatedButton(
-                  onPressed: details.onStepContinue,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue.shade700,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24.0,
-                      vertical: 10.0,
-                    ),
-                    textStyle: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1.0,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    elevation: 3,
-                  ),
-                  child: const Text('Next'),
-                ),
+      body: Column(
+        children: [
+          // Progress indicator
+          Container(
+            height: 4,
+            child: LinearProgressIndicator(
+              value: (_currentPage + 1) / 5,
+              backgroundColor: Colors.grey[300],
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue[700]!),
+            ),
+          ),
 
-              if (details.stepIndex == 5)
-                ElevatedButton(
-                  onPressed: details.onStepContinue,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green.shade600,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24.0,
-                      vertical: 14.0,
-                    ),
-                    textStyle: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 4,
-                  ),
-                  child: const Text('Submit'),
-                ),
+          // Content
+          Expanded(
+            child: PageView(
+              controller: _pageController,
+              onPageChanged: (index) => setState(() => _currentPage = index),
+              children: [
+                ProductDetailsScreen(data: _formData['product']),
+                CustomerDetailsScreen(data: _formData['customer']),
+                InvoiceDetailsScreen(data: _formData['invoice']),
+                ProductImagesScreen(data: _formData['images']),
+                WarrantyDetailsScreen(data: _formData['warranty'],  warrantyPlansFuture: _warrantyPlans,),
+              ],
+            ),
+          ),
 
-              const SizedBox(width: 8),
-              if (details.stepIndex > 0)
-                TextButton(
-                  onPressed: details.onStepCancel,
-                  child: const Text('Back'),
+          // Navigation
+          Container(
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 4,
+                  offset: Offset(0, -2),
                 ),
-            ],
-          );
-        },
-        steps: [
-          Step(
-            title: const Text('Customer Details'),
-            isActive: _currentStep >= 0,
-            content: Form(
-              key: _formKeys[0],
-              child: Column(
-                children: [
-                  _buildTextField('Name', 'name', customerData),
-                  _buildTextField(
-                    'Email',
-                    'email',
-                    customerData,
-                    type: TextInputType.emailAddress,
-                    validator: _validateEmail,
-                  ),
-                  _buildTextField(
-                    'Mobile',
-                    'mobile',
-                    customerData,
-                    type: TextInputType.phone,
-                    validator: _validateMobile,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(10),
-                    ],
-                  ),
-                  _buildTextField(
-                    'Alternate Number',
-                    'alternateNumber',
-                    customerData,
-                    type: TextInputType.phone,
-                    validator: (value) => null, // Optional field
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(10),
-                    ],
-                  ),
-                  _buildTextField('Street', 'street', customerData),
-                  _buildTextField('City', 'city', customerData),
-                  _buildTextField('State', 'state', customerData),
-                  _buildTextField('Country', 'country', customerData),
-                  _buildTextField(
-                    'Zip Code',
-                    'zipCode',
-                    customerData,
-                    type: TextInputType.number,
-                  ),
-                ],
-              ),
+              ],
             ),
-          ),
-          Step(
-            title: const Text('Product Details'),
-            isActive: _currentStep >= 1,
-            content: Form(
-              key: _formKeys[1],
-              child: Column(
-                children: [
-                  _buildTextField('Model Name', 'modelName', productData),
-                  _buildTextField(
-                    'IMEI 1',
-                    'imei1',
-                    productData,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(15),
-                    ],
+            child: Row(
+              children: [
+                if (_currentPage > 0)
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: _previousPage,
+                      child: Text('Previous'),
+                    ),
                   ),
-                  _buildTextField(
-                    'IMEI 2',
-                    'imei2',
-                    productData,
-                    validator: (value) => null, // Optional field
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(15),
-                    ],
+                if (_currentPage > 0) SizedBox(width: 16),
+                Expanded(
+                  flex: 2,
+                  child: ElevatedButton(
+                    onPressed: _currentPage == 4 ? _submitForm : _nextPage,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          _currentPage == 4 ? Colors.green : Colors.blue[700],
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: Text(_currentPage == 4 ? 'Submit Form' : 'Next'),
                   ),
-                  _buildTextField('Brand', 'brand', productData),
-                  _buildTextField('Category', 'category', productData),
-                  _buildTextField(
-                    'Purchase Price',
-                    'purchasePrice',
-                    productData,
-                    type: TextInputType.number,
-                    validator:
-                        (value) => _validateNumber(value, 'Purchase Price'),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(
-                        RegExp(r'^\d+\.?\d{0,2}'),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Step(
-            title: const Text('Invoice Details'),
-            isActive: _currentStep >= 2,
-            content: Form(
-              key: _formKeys[2],
-              child: Column(
-                children: [
-                  _buildTextField(
-                    'Invoice Number',
-                    'invoiceNumber',
-                    invoiceData,
-                  ),
-                  _buildTextField(
-                    'Invoice Amount',
-                    'invoiceAmount',
-                    invoiceData,
-                    type: TextInputType.number,
-                    validator:
-                        (value) => _validateNumber(value, 'Invoice Amount'),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(
-                        RegExp(r'^\d+\.?\d{0,2}'),
-                      ),
-                    ],
-                  ),
-                  _buildTextField(
-                    'Invoice Image URL',
-                    'invoiceImage',
-                    invoiceData,
-                  ),
-                  _buildDatePicker('Invoice Date', 'invoiceDate', invoiceData),
-                ],
-              ),
-            ),
-          ),
-          Step(
-            title: const Text('Product Images'),
-            isActive: _currentStep >= 3,
-            content: Form(
-              key: _formKeys[3],
-              child: Column(
-                children: [
-                  _buildTextField(
-                    'Front Image URL',
-                    'frontImage',
-                    productImagesData,
-                  ),
-                  _buildTextField(
-                    'Back Image URL',
-                    'backImage',
-                    productImagesData,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildAdditionalImagesSection(),
-                ],
-              ),
-            ),
-          ),
-          Step(
-            title: const Text('Warranty Details'),
-            isActive: _currentStep >= 4,
-            content: Form(
-              key: _formKeys[4],
-              child: Column(
-                children: [
-                  _buildTextField('Plan ID', 'planId', warrantyData),
-                  _buildTextField('Plan Name', 'planName', warrantyData),
-                  _buildTextField(
-                    'Warranty Period (months)',
-                    'warrantyPeriod',
-                    warrantyData,
-                    type: TextInputType.number,
-                    validator:
-                        (value) => _validateNumber(value, 'Warranty Period'),
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  ),
-                  _buildDatePicker('Start Date', 'startDate', warrantyData),
-                  _buildDatePicker('Expiry Date', 'expiryDate', warrantyData),
-                  _buildTextField(
-                    'Premium Amount',
-                    'premiumAmount',
-                    warrantyData,
-                    type: TextInputType.number,
-                    validator:
-                        (value) => _validateNumber(value, 'Premium Amount'),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(
-                        RegExp(r'^\d+\.?\d{0,2}'),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Step(
-            title: const Text('Payment Details'),
-            isActive: _currentStep >= 5,
-            content: Form(
-              key: _formKeys[5],
-              child: Column(
-                children: [
-                  _buildPaymentStatusDropdown(),
-                  _buildDatePicker('Payment Date', 'paymentDate', paymentData),
-                  _buildTextField(
-                    'Payment Method',
-                    'paymentMethod',
-                    paymentData,
-                  ),
-                  _buildTextField(
-                    'Payment Order ID',
-                    'paymentOrderId',
-                    paymentData,
-                  ),
-                  _buildTextField('Payment ID', 'paymentId', paymentData),
-                  _buildTextField(
-                    'Transaction ID',
-                    'transactionId',
-                    paymentData,
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _nextPage() {
+    _pageController.nextPage(
+      duration: Duration(milliseconds: 250),
+      curve: Curves.easeOut,
+    );
+  }
+
+  void _previousPage() {
+    _pageController.previousPage(
+      duration: Duration(milliseconds: 250),
+      curve: Curves.easeOut,
+    );
+  }
+
+  Future<void> _submitForm() async {
+    final combinedData = {
+      "customerDetails": {
+        "name": _formData['customer']['name'] ?? '',
+        "email": _formData['customer']['email'] ?? '',
+        "mobile": _formData['customer']['mobile'] ?? '',
+        "alternateNumber": _formData['customer']['alternateNumber'] ?? '',
+        "address": {
+          "street": _formData['customer']['street'] ?? '',
+          "city": _formData['customer']['city'] ?? '',
+          "state": _formData['customer']['state'] ?? '',
+          "country": _formData['customer']['country'] ?? '',
+          "zipCode": _formData['customer']['zipCode'] ?? '',
+        },
+      },
+      "productDetails": {
+        "modelName": _formData['product']['modelName'] ?? '',
+        "imei1": _formData['product']['imei1'] ?? '',
+        "imei2": _formData['product']['imei2'] ?? '',
+        "brand": _formData['product']['brand'] ?? '',
+        "category": _formData['product']['category'] ?? '',
+        "purchasePrice":
+            double.tryParse(_formData['product']['purchasePrice'] ?? '') ?? 0,
+      },
+      "invoiceDetails": {
+        "invoiceNumber": _formData['invoice']['invoiceNumber'] ?? '',
+        "invoiceAmount":
+            double.tryParse(
+              _formData['invoice']['invoiceAmount']?.toString() ?? '',
+            ) ??
+            0,
+        "invoiceImage":
+            _formData['invoice']['invoiceImage'] ?? '', // Now a URL string
+        "invoiceDate": DateFormat(
+          'yyyy-MM-dd',
+        ).format(_formData['invoice']['invoiceDate']),
+      },
+      "productImages": {
+        "frontImage":
+            _formData['images']['frontImage'] ?? '', // Now a URL string
+        "backImage": _formData['images']['backImage'] ?? '', // Now a URL string
+        "additionalImages":
+            _formData['images']['additionalImages'] ??
+            [], // Now list of URL strings
+      },
+      "warrantyDetails": {
+        "planId": _formData['warranty']['planId'] ?? '',
+        "planName": _formData['warranty']['planName'] ?? '',
+        "warrantyPeriod":
+            int.tryParse(
+              _formData['warranty']['warrantyPeriod']?.toString() ?? '',
+            ) ??
+            0,
+        "startDate": DateFormat(
+          'yyyy-MM-dd',
+        ).format(_formData['warranty']['startDate']),
+        "expiryDate": DateFormat(
+          'yyyy-MM-dd',
+        ).format(_formData['warranty']['expiryDate']),
+        "premiumAmount":
+            double.tryParse(
+              _formData['warranty']['premiumAmount']?.toString() ?? '',
+            ) ??
+            0,
+      },
+    };
+
+    print("FORMDATA: $combinedData");
+
+    try {
+      final response = await submitCustomerData(combinedData);
+      final decoded = jsonDecode(response.body);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final String message =
+            decoded['message'] ?? 'Customer created successfully.';
+      
+
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder:
+                (context) => AlertDialog(
+                  title: const Text('Success!'),
+                  content: Text(message),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ),
+          );
+        }
+      } else {
+        final errorMessage =
+            decoded['error']?['message'] ?? 'Unknown error occurred.';
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder:
+                (context) => AlertDialog(
+                  title: const Text('Error'),
+                  content: Text(errorMessage),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    }
+  }
+}
+
+// File Upload Service
+class FileUploadService {
+  static const String baseUrl = 'https://boxer-patient-slowly.ngrok-free.app';
+  static const String uploadEndpoint = '/api/customers/handle-file';
+
+  static Future<String?> uploadFile(File file) async {
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl$uploadEndpoint'),
+      );
+
+      // Add the file
+      request.files.add(await http.MultipartFile.fromPath('file', file.path));
+
+      // Add mode parameter
+      request.fields['mode'] = 'upload';
+
+      var response = await request.send();
+      var responseBody = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(responseBody);
+        String relativePath = jsonResponse['message'];
+        return '$baseUrl$relativePath'; // Return full URL
+      } else {
+        print('Upload failed: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Upload error: $e');
+      return null;
+    }
+  }
+
+  static Future<bool> deleteFile(String fileUrl) async {
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl$uploadEndpoint'),
+      );
+
+      // Add mode and deleteFile parameters
+      request.fields['mode'] = 'delete';
+      request.fields['deleteFile'] = fileUrl;
+
+      var response = await request.send();
+      var responseBody = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(responseBody);
+        return jsonResponse['message'] == 'deleted';
+      } else {
+        print('Delete failed: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Delete error: $e');
+      return false;
+    }
+  }
+}
+
+// Individual Screen Components (Ultra Lightweight)
+class ProductDetailsScreen extends StatelessWidget {
+  final Map<String, String> data;
+
+  ProductDetailsScreen({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(16),
+      child: Column(
+        children: [
+          _buildSimpleField('Model Name', 'modelName'),
+          _buildSimpleField('IMEI 1', 'imei1', TextInputType.number),
+          _buildSimpleField('IMEI 2 (Optional)', 'imei2', TextInputType.number),
+          _buildSimpleField('Brand', 'brand'),
+          _buildSimpleField('Category', 'category'),
+          _buildSimpleField(
+            'Purchase Price',
+            'purchasePrice',
+            TextInputType.number,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSimpleField(String label, String key, [TextInputType? type]) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 16),
+      child: TextField(
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(),
+          filled: true,
+          fillColor: Colors.white,
+        ),
+        keyboardType: type,
+        onChanged: (value) => data[key] = value,
+      ),
+    );
+  }
+}
+
+class CustomerDetailsScreen extends StatelessWidget {
+  final Map<String, String> data;
+
+  CustomerDetailsScreen({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(16),
+      child: Column(
+        children: [
+          _buildSimpleField('Full Name', 'name'),
+          _buildSimpleField('Email', 'email', TextInputType.emailAddress),
+          _buildSimpleField('Mobile Number', 'mobile', TextInputType.phone),
+          _buildSimpleField(
+            'Alternate Number',
+            'alternateNumber',
+            TextInputType.phone,
+          ),
+          _buildSimpleField('Street Address', 'street'),
+          _buildSimpleField('City', 'city'),
+          _buildSimpleField('State', 'state'),
+          _buildSimpleField('Country', 'country'),
+          _buildSimpleField('Zip Code', 'zipCode', TextInputType.number),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSimpleField(String label, String key, [TextInputType? type]) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 16),
+      child: TextField(
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(),
+          filled: true,
+          fillColor: Colors.white,
+        ),
+        keyboardType: type,
+        onChanged: (value) => data[key] = value,
+      ),
+    );
+  }
+}
+
+class InvoiceDetailsScreen extends StatefulWidget {
+  final Map<String, dynamic> data;
+
+  InvoiceDetailsScreen({required this.data});
+
+  @override
+  State<InvoiceDetailsScreen> createState() => _InvoiceDetailsScreenState();
+}
+
+class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
+  final ImagePicker _picker = ImagePicker();
+  bool _isUploading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(16),
+      child: Column(
+        children: [
+          _buildSimpleField('Invoice Number', 'invoiceNumber'),
+          _buildSimpleField(
+            'Invoice Amount',
+            'invoiceAmount',
+            TextInputType.number,
+          ),
+          SizedBox(height: 16),
+          _buildImageSection(),
+          SizedBox(height: 16),
+          _buildDatePicker(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSimpleField(String label, String key, [TextInputType? type]) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 16),
+      child: TextField(
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(),
+          filled: true,
+          fillColor: Colors.white,
+        ),
+        keyboardType: type,
+        onChanged: (value) => widget.data[key] = value,
+      ),
+    );
+  }
+
+  Widget _buildImageSection() {
+    final String? imageUrl = widget.data['invoiceImage'];
+
+    return Container(
+      width: double.infinity,
+      height: 120,
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(8),
+        color: Colors.white,
+      ),
+      child:
+          _isUploading
+              ? Center(child: CircularProgressIndicator())
+              : imageUrl != null
+              ? Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      imageUrl,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.error, color: Colors.red),
+                              Text('Failed to load image'),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: IconButton(
+                        icon: Icon(Icons.delete, color: Colors.white, size: 20),
+                        onPressed: _deleteImage,
+                        constraints: BoxConstraints(
+                          minWidth: 32,
+                          minHeight: 32,
+                        ),
+                        padding: EdgeInsets.all(4),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+              : InkWell(
+                onTap: _pickImage,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.add_a_photo, size: 32, color: Colors.grey),
+                    SizedBox(height: 8),
+                    Text('Tap to select invoice image'),
+                  ],
+                ),
+              ),
+    );
+  }
+
+  Widget _buildDatePicker() {
+    return InkWell(
+      onTap: () async {
+        final picked = await showDatePicker(
+          context: context,
+          initialDate: widget.data['invoiceDate'],
+          firstDate: DateTime(2020),
+          lastDate: DateTime(2030),
+        );
+        if (picked != null) {
+          setState(() => widget.data['invoiceDate'] = picked);
+        }
+      },
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(4),
+          color: Colors.white,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Invoice Date: ${DateFormat('yyyy-MM-dd').format(widget.data['invoiceDate'])}',
+            ),
+            Icon(Icons.calendar_today),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() => _isUploading = true);
+
+      final uploadedUrl = await FileUploadService.uploadFile(File(image.path));
+
+      setState(() {
+        _isUploading = false;
+        if (uploadedUrl != null) {
+          widget.data['invoiceImage'] = uploadedUrl;
+        } else {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Failed to upload image')));
+        }
+      });
+    }
+  }
+
+  Future<void> _deleteImage() async {
+    final String? imageUrl = widget.data['invoiceImage'];
+    if (imageUrl != null) {
+      setState(() => _isUploading = true);
+
+      final success = await FileUploadService.deleteFile(imageUrl);
+
+      setState(() {
+        _isUploading = false;
+        if (success) {
+          widget.data['invoiceImage'] = null;
+        } else {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Failed to delete image')));
+        }
+      });
+    }
+  }
+}
+
+class ProductImagesScreen extends StatefulWidget {
+  final Map<String, dynamic> data;
+
+  ProductImagesScreen({required this.data});
+
+  @override
+  State<ProductImagesScreen> createState() => _ProductImagesScreenState();
+}
+
+class _ProductImagesScreenState extends State<ProductImagesScreen> {
+  final ImagePicker _picker = ImagePicker();
+  bool _isUploading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(16),
+      child: Column(
+        children: [
+          _buildImageSection('Front Image', 'frontImage'),
+          SizedBox(height: 16),
+          _buildImageSection('Back Image', 'backImage'),
+          SizedBox(height: 24),
+          Text(
+            'Additional Images',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 16),
+          ..._buildAdditionalImages(),
+          SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: _isUploading ? null : _addAdditionalImage,
+            icon: Icon(Icons.add),
+            label: Text('Add Image'),
+          ),
+          if (_isUploading)
+            Padding(
+              padding: EdgeInsets.only(top: 16),
+              child: CircularProgressIndicator(),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageSection(String label, String key) {
+    final String? imageUrl = widget.data[key];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: TextStyle(fontWeight: FontWeight.w500)),
+        SizedBox(height: 8),
+        Container(
+          width: double.infinity,
+          height: 120,
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(8),
+            color: Colors.white,
+          ),
+          child:
+              imageUrl != null
+                  ? Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.error, color: Colors.red),
+                                  Text('Failed to load image'),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.delete,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                            onPressed: () => _deleteImage(key),
+                            constraints: BoxConstraints(
+                              minWidth: 32,
+                              minHeight: 32,
+                            ),
+                            padding: EdgeInsets.all(4),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                  : InkWell(
+                    onTap: _isUploading ? null : () => _pickImage(key),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.add_a_photo, size: 32, color: Colors.grey),
+                        SizedBox(height: 8),
+                        Text('Tap to select $label'),
+                      ],
+                    ),
+                  ),
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _buildAdditionalImages() {
+    final List<String> imageUrls = List<String>.from(
+      widget.data['additionalImages'] ?? [],
+    );
+    return imageUrls.asMap().entries.map((entry) {
+      return Padding(
+        padding: EdgeInsets.only(bottom: 16),
+        child: Row(
+          children: [
+            Expanded(
+              child: Container(
+                height: 80,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    entry.value,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Center(
+                        child: Icon(Icons.error, color: Colors.red),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(width: 8),
+            IconButton(
+              onPressed:
+                  _isUploading ? null : () => _removeAdditionalImage(entry.key),
+              icon: Icon(Icons.delete, color: Colors.red),
+            ),
+          ],
+        ),
+      );
+    }).toList();
+  }
+
+  Future<void> _pickImage(String key) async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() => _isUploading = true);
+
+      final uploadedUrl = await FileUploadService.uploadFile(File(image.path));
+
+      setState(() {
+        _isUploading = false;
+        if (uploadedUrl != null) {
+          widget.data[key] = uploadedUrl;
+        } else {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Failed to upload image')));
+        }
+      });
+    }
+  }
+
+  Future<void> _addAdditionalImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() => _isUploading = true);
+
+      final uploadedUrl = await FileUploadService.uploadFile(File(image.path));
+
+      setState(() {
+        _isUploading = false;
+        if (uploadedUrl != null) {
+          final List<String> imageUrls = List<String>.from(
+            widget.data['additionalImages'] ?? [],
+          );
+          imageUrls.add(uploadedUrl);
+          widget.data['additionalImages'] = imageUrls;
+        } else {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Failed to upload image')));
+        }
+      });
+    }
+  }
+
+  Future<void> _removeAdditionalImage(int index) async {
+    final List<String> imageUrls = List<String>.from(
+      widget.data['additionalImages'] ?? [],
+    );
+
+    if (index < imageUrls.length) {
+      final imageUrl = imageUrls[index];
+      setState(() => _isUploading = true);
+
+      final success = await FileUploadService.deleteFile(imageUrl);
+
+      setState(() {
+        _isUploading = false;
+        if (success) {
+          imageUrls.removeAt(index);
+          widget.data['additionalImages'] = imageUrls;
+        } else {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Failed to delete image')));
+        }
+      });
+    }
+  }
+
+  Future<void> _deleteImage(String key) async {
+    final String? imageUrl = widget.data[key];
+    if (imageUrl != null) {
+      setState(() => _isUploading = true);
+
+      final success = await FileUploadService.deleteFile(imageUrl);
+
+      setState(() {
+        _isUploading = false;
+        if (success) {
+          widget.data[key] = null;
+        } else {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Failed to delete image')));
+        }
+      });
+    }
+  }
+}
+class WarrantyDetailsScreen extends StatefulWidget {
+  final Map<String, dynamic> data;
+  final Future<List<WarrantyPlans>> warrantyPlansFuture;
+
+  WarrantyDetailsScreen({
+    required this.data,
+    required this.warrantyPlansFuture,
+  });
+
+  @override
+  State<WarrantyDetailsScreen> createState() => _WarrantyDetailsScreenState();
+}
+
+class _WarrantyDetailsScreenState extends State<WarrantyDetailsScreen> {
+  WarrantyPlans? selectedPlan;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<WarrantyPlans>>(
+      future: widget.warrantyPlansFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        if (!snapshot.hasData || snapshot.hasError) {
+          return Center(child: Text('Failed to load warranty plans.'));
+        }
+
+        final plans = snapshot.data!;
+
+        return SingleChildScrollView(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            children: [
+              // Dropdown
+              DropdownButtonFormField<WarrantyPlans>(
+                decoration: InputDecoration(
+                  labelText: 'Select Warranty Plan',
+                  border: OutlineInputBorder(),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+                value: selectedPlan,
+                isExpanded: true,
+                items: plans.map((plan) {
+                  return DropdownMenuItem<WarrantyPlans>(
+                    value: plan,
+                    child: Text('${plan.planName} (${plan.duration} months, ₹${plan.premiumAmount})'),
+                  );
+                }).toList(),
+                onChanged: (WarrantyPlans? plan) {
+                  if (plan != null) {
+                    setState(() {
+                      selectedPlan = plan;
+
+                      // Fill the fields with selected plan data
+                      widget.data['planId'] = plan.planId;
+                      widget.data['planName'] = plan.planName;
+                      widget.data['warrantyPeriod'] = plan.duration;
+                      widget.data['premiumAmount'] = plan.premiumAmount;
+                    });
+                  }
+                },
+              ),
+
+              SizedBox(height: 16),
+
+              _buildSimpleField('Plan ID', 'planId'),
+              _buildSimpleField('Plan Name', 'planName'),
+              _buildSimpleField('Warranty Period (months)', 'warrantyPeriod', TextInputType.number),
+              _buildSimpleField('Premium Amount', 'premiumAmount', TextInputType.number),
+              SizedBox(height: 16),
+              _buildDatePicker('Start Date', 'startDate'),
+              SizedBox(height: 16),
+              _buildDatePicker('Expiry Date', 'expiryDate'),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSimpleField(String label, String key, [TextInputType? type]) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 16),
+      child: TextField(
+        controller: TextEditingController(text: widget.data[key]?.toString() ?? '')
+          ..selection = TextSelection.collapsed(offset: (widget.data[key]?.toString() ?? '').length),
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(),
+          filled: true,
+          fillColor: Colors.white,
+        ),
+        keyboardType: type,
+        onChanged: (value) => widget.data[key] = value,
+      ),
+    );
+  }
+
+  Widget _buildDatePicker(String label, String key) {
+    return InkWell(
+      onTap: () async {
+        final picked = await showDatePicker(
+          context: context,
+          initialDate: widget.data[key],
+          firstDate: DateTime(2020),
+          lastDate: DateTime(2030),
+        );
+        if (picked != null) {
+          setState(() => widget.data[key] = picked);
+        }
+      },
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(4),
+          color: Colors.white,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              '$label: ${DateFormat('yyyy-MM-dd').format(widget.data[key])}',
+            ),
+            Icon(Icons.calendar_today),
+          ],
+        ),
       ),
     );
   }
