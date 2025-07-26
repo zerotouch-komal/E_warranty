@@ -1,6 +1,6 @@
 import 'package:e_warranty/screens/Register.dart';
 import 'package:e_warranty/screens/dashboard.dart';
-import 'package:e_warranty/screens/key_history.dart';
+import 'package:e_warranty/screens/wallet_history.dart';
 import 'package:e_warranty/screens/profile.dart';
 import 'package:e_warranty/screens/all_user.dart';
 import 'package:e_warranty/utils/pixelutil.dart';
@@ -20,7 +20,7 @@ class _MyDrawerState extends State<MyDrawer> {
     DashboardScreen(),
     UserListScreen(),
     RegisterScreen(),
-    KeyHistoryScreen(),
+    WalletHistory(),
     ProfileScreen(),
   ];
 

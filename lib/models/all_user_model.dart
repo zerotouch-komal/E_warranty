@@ -1,45 +1,103 @@
 class UserModel {
+  final String id;
   final String userId;
-  final String name;
+  final String companyId;
   final String userType;
+  final String name;
+  final String email;
+  final String phone;
+  final bool isActive;
   final String? parentUserId;
-  final KeyAllocation keyAllocation;
+  final Address address;
+  final WalletBalance walletBalance;
+  final DateTime createdAt;
+  final ParentUser? parentUser; // ✅ New field
 
   UserModel({
+    required this.id,
     required this.userId,
-    required this.name,
+    required this.companyId,
     required this.userType,
+    required this.name,
+    required this.email,
+    required this.phone,
+    required this.isActive,
     this.parentUserId,
-    required this.keyAllocation,
+    required this.address,
+    required this.walletBalance,
+    required this.createdAt,
+    this.parentUser,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      userId: json['userId'],
-      name: json['name'],
-      userType: json['userType'],
+      id: json['_id'] ?? '',
+      userId: json['userId'] ?? '',
+      companyId: json['companyId'] ?? '',
+      userType: json['userType'] ?? '',
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
+      phone: json['phone'] ?? '',
+      isActive: json['isActive'] ?? false,
       parentUserId: json['parentUserId'],
-      keyAllocation: KeyAllocation.fromJson(json['keyAllocation']),
+      address: json['address'] != null
+          ? Address.fromJson(json['address'])
+          : Address(city: '', state: ''),
+      walletBalance: json['walletBalance'] != null
+          ? WalletBalance.fromJson(json['walletBalance'])
+          : WalletBalance(remainingAmount: 0),
+      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+      parentUser: json['parentUser'] != null
+          ? ParentUser.fromJson(json['parentUser'])
+          : null,
     );
   }
 }
 
-class KeyAllocation {
-  final int totalKeys;
-  final int usedKeys;
-  final int remainingKeys;
+class ParentUser {
+  final String userId;
+  final String name;
 
-  KeyAllocation({
-    required this.totalKeys,
-    required this.usedKeys,
-    required this.remainingKeys,
+  ParentUser({
+    required this.userId,
+    required this.name,
   });
 
-  factory KeyAllocation.fromJson(Map<String, dynamic> json) {
-    return KeyAllocation(
-      totalKeys: json['totalKeys'],
-      usedKeys: json['usedKeys'],
-      remainingKeys: json['remainingKeys'],
+  factory ParentUser.fromJson(Map<String, dynamic> json) {
+    return ParentUser(
+      userId: json['userId'] ?? '',
+      name: json['name'] ?? '',
+    );
+  }
+}
+
+class Address {
+  final String city;
+  final String state;
+
+  Address({
+    required this.city,
+    required this.state,
+  });
+
+  factory Address.fromJson(Map<String, dynamic> json) {
+    return Address(
+      city: json['city'] ?? '',
+      state: json['state'] ?? '',
+    );
+  }
+}
+
+class WalletBalance {
+  final double remainingAmount;
+
+  WalletBalance({
+    required this.remainingAmount,
+  });
+
+  factory WalletBalance.fromJson(Map<String, dynamic> json) {
+    return WalletBalance(
+      remainingAmount: (json['remainingAmount'] ?? 0).toDouble(),
     );
   }
 }

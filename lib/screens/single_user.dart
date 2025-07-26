@@ -1,4 +1,4 @@
-import 'package:e_warranty/provider/all_user_provider.dart';
+import 'package:e_warranty/provider/get_single_user_provider.dart';
 import 'package:e_warranty/utils/pixelutil.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,13 +16,13 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
   void initState() {
     super.initState();
     Future.microtask(
-      () => context.read<UserProvider>().fetchUserDetails(widget.userId),
+      () => context.read<SingleUserProvider>().fetchUserDetails(widget.userId),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<UserProvider>();
+    final provider = context.watch<SingleUserProvider>();
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -137,11 +137,11 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                       title: "Address",
                       icon: Icons.location_on_outlined,
                       children: [
-                        _buildInfoRow(
-                          "Street",
-                          provider.userDetails!.address.street,
-                          Icons.home_outlined,
-                        ),
+                        // _buildInfoRow(
+                        //   "Street",
+                        //   provider.userDetails!.address.street,
+                        //   Icons.home_outlined,
+                        // ),
                         _buildInfoRow(
                           "City",
                           provider.userDetails!.address.city,
@@ -152,25 +152,26 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                           provider.userDetails!.address.state,
                           Icons.map_outlined,
                         ),
-                        _buildInfoRow(
-                          "Country",
-                          provider.userDetails!.address.country,
-                          Icons.public_outlined,
-                        ),
-                        _buildInfoRow(
-                          "Zip Code",
-                          provider.userDetails!.address.zipCode,
-                          Icons.markunread_mailbox_outlined,
-                        ),
+                        // _buildInfoRow(
+                        //   "Country",
+                        //   provider.userDetails!.address.country,
+                        //   Icons.public_outlined,
+                        // ),
+                        // _buildInfoRow(
+                        //   "Zip Code",
+                        //   provider.userDetails!.address.zipCode,
+                        //   Icons.markunread_mailbox_outlined,
+                        // ),
                       ],
                     ),
                     SizedBox(height: ScreenUtil.unitHeight * 20),
 
                     _buildSection(
-                      title: "Key Allocation",
-                      icon: Icons.vpn_key_outlined,
-                      children: [_buildKeyAllocationCard(provider)],
+                      title: "Wallet Balance",
+                      icon: Icons.account_balance_wallet_outlined,
+                      children: [_buildWalletCard(provider)],
                     ),
+
                     SizedBox(height: ScreenUtil.unitHeight * 20),
                   ],
                 ),
@@ -178,7 +179,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
     );
   }
 
-  Widget _buildProfileCard(UserProvider provider) {
+  Widget _buildProfileCard(SingleUserProvider provider) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(ScreenUtil.unitHeight * 20),
@@ -231,7 +232,10 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
           ),
           SizedBox(height: 8),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: ScreenUtil.unitHeight * 20, vertical: 6),
+            padding: EdgeInsets.symmetric(
+              horizontal: ScreenUtil.unitHeight * 20,
+              vertical: 6,
+            ),
             decoration: BoxDecoration(
               color:
                   provider.userDetails!.isActive
@@ -379,74 +383,44 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
     );
   }
 
-  Widget _buildKeyAllocationCard(UserProvider provider) {
-    final usedKeys = provider.userDetails!.keyAllocation.usedKeys;
-    final remainingKeys = provider.userDetails!.keyAllocation.remainingKeys;
+Widget _buildWalletCard(SingleUserProvider provider) {
+  final amount = provider.userDetails!.walletBalance.remainingAmount;
 
-    return Column(
+  return Container(
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Colors.teal.withOpacity(0.05),
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: Colors.teal.withOpacity(0.1), width: 1),
+    ),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildKeyStatCard(
-              title: "Remaining Keys",
-              value: remainingKeys.toString(),
-              icon: Icons.vpn_key_outlined,
-              color: Colors.blue,
-            ),
-            _buildKeyStatCard(
-              title: "Used Keys",
-              value: usedKeys.toString(),
-              icon: Icons.check_circle_outline,
-              color: Colors.green,
+            Icon(Icons.account_balance_wallet_outlined, size: 24, color: Colors.teal),
+            SizedBox(width: ScreenUtil.unitHeight * 20),
+            Text(
+              "Available Balance",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[700],
+              ),
             ),
           ],
         ),
+        Text(
+          "₹${amount.toStringAsFixed(2)}",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.teal,
+          ),
+        ),
       ],
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildKeyStatCard({
-    required String title,
-    required String value,
-    required IconData icon,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.1), width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Icon(icon, size: 20, color: color),
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: ScreenUtil.unitHeight * 20),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey[600],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

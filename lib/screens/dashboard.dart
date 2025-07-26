@@ -1,8 +1,10 @@
 import 'package:e_warranty/provider/dashboard_provider.dart';
-import 'package:e_warranty/screens/key_history.dart';
+import 'package:e_warranty/screens/all_user.dart';
+import 'package:e_warranty/screens/wallet_history.dart';
 import 'package:e_warranty/utils/pixelutil.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -39,17 +41,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
         shadowColor: Colors.black12,
         title: Text(
           'Dashboard',
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: ScreenUtil.unitHeight * 26),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none_rounded),
-            tooltip: 'Notifications',
-            onPressed: () {
-              
-            },
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: ScreenUtil.unitHeight * 26,
           ),
-        ],
+        ),
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.notifications_none_rounded),
+        //     tooltip: 'Notifications',
+        //     onPressed: () {},
+        //   ),
+        // ],
       ),
 
       body: Consumer<DashboardProvider>(
@@ -67,7 +70,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             return Center(
               child: Text(
                 'No data available',
-                style: TextStyle(fontSize: ScreenUtil.unitHeight * 20, color: Colors.grey[600]),
+                style: TextStyle(
+                  fontSize: ScreenUtil.unitHeight * 20,
+                  color: Colors.grey[600],
+                ),
               ),
             );
           }
@@ -77,13 +83,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildKeyStatistics(context),
+                _buildWalletStatistics(context),
 
-                SizedBox(height: 32),
+                SizedBox(height: ScreenUtil.unitHeight * 32),
 
                 _buildUserTypeGrid(stats),
 
-                SizedBox(height: 32),
+                SizedBox(height: ScreenUtil.unitHeight * 32),
 
                 _buildTableSection(stats),
               ],
@@ -94,7 +100,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildKeyStatistics(BuildContext context) {
+  Widget _buildWalletStatistics(BuildContext context) {
     final stats = Provider.of<DashboardProvider>(context, listen: false).stats;
 
     return Container(
@@ -106,7 +112,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Key Statistics',
+                'Wallet Statistics',
                 style: TextStyle(
                   fontSize: ScreenUtil.unitHeight * 24,
                   fontWeight: FontWeight.bold,
@@ -118,7 +124,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const KeyHistoryScreen(),
+                      builder: (context) => const WalletHistory(),
                     ),
                   );
                 },
@@ -150,26 +156,44 @@ class _DashboardScreenState extends State<DashboardScreen> {
             padding: EdgeInsets.all(ScreenUtil.unitHeight * 24),
             child: Row(
               children: [
+                // Expanded(
+                //   child: _buildStatCard(
+                //     'Total Amount',
+                //     '₹${_formatCurrency(stats?.walletBalance.totalAmount ?? 0)}',
+                //     Colors.blue[400]!,
+                //     Icons.account_balance_wallet,
+                //   ),
+                // ),
+                Container(
+                  width: 1,
+                  height: ScreenUtil.unitHeight * 20,
+                  color: Colors.grey[200],
+                  margin: EdgeInsets.symmetric(
+                    horizontal: ScreenUtil.unitHeight * 20,
+                  ),
+                ),
                 Expanded(
                   child: _buildStatCard(
-                    'Keys',
-                    stats?.keyAllocation.remainingKeys.toString() ?? '0',
-                    Colors.orange[400]!,
-                    Icons.dashboard,
+                    'Remaining',
+                    '₹${_formatCurrency(stats?.walletBalance.remainingAmount ?? 0)}',
+                    Colors.green[400]!,
+                    Icons.account_balance_wallet_outlined,
                   ),
                 ),
                 Container(
                   width: 1,
                   height: ScreenUtil.unitHeight * 20,
                   color: Colors.grey[200],
-                  margin: EdgeInsets.symmetric(horizontal: ScreenUtil.unitHeight * 20),
+                  margin: EdgeInsets.symmetric(
+                    horizontal: ScreenUtil.unitHeight * 20,
+                  ),
                 ),
                 Expanded(
                   child: _buildStatCard(
-                    'Used',
-                    stats?.keyAllocation.usedKeys.toString() ?? '0',
-                    Colors.green[400]!,
-                    Icons.check_circle,
+                    'Used Amount',
+                    '₹${_formatCurrency(stats?.walletBalance.usedAmount ?? 0)}',
+                    Colors.red[400]!,
+                    Icons.money_off,
                   ),
                 ),
               ],
@@ -178,6 +202,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ],
       ),
     );
+  }
+
+  String _formatCurrency(int amount) {
+    final formatter = NumberFormat('#,##,###');
+    return formatter.format(amount);
   }
 
   Widget _buildStatCard(
@@ -196,23 +225,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           child: Icon(icon, color: color, size: 24),
         ),
-        SizedBox(height: ScreenUtil.unitHeight * 20),
+        SizedBox(height: ScreenUtil.unitHeight * 16),
         Text(
           value,
           style: TextStyle(
-            fontSize: ScreenUtil.unitHeight * 20,
+            fontSize: ScreenUtil.unitHeight * 16,
             fontWeight: FontWeight.bold,
             color: Colors.grey[800],
           ),
+          textAlign: TextAlign.center,
         ),
-        SizedBox(height: ScreenUtil.unitHeight * 10),
+        SizedBox(height: ScreenUtil.unitHeight * 8),
         Text(
           title,
           style: TextStyle(
-            fontSize: ScreenUtil.unitHeight * 16,
+            fontSize: ScreenUtil.unitHeight * 14,
             color: Colors.grey[600],
             fontWeight: FontWeight.w500,
           ),
+          textAlign: TextAlign.center,
         ),
       ],
     );
@@ -272,15 +303,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'User Type Distribution',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'User Type Distribution',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      SizedBox(height: ScreenUtil.unitHeight * 10),
+                      Text(
+                        'Total Customers: ${stats.totalCustomersCount}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: ScreenUtil.unitHeight * 20),
                   stats.userTypeCount != null && stats.userTypeCount.isNotEmpty
                       ? GridView.builder(
                         shrinkWrap: true,
@@ -316,7 +361,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   color: color.withOpacity(0.2),
                                 ),
                               ),
-                              padding: EdgeInsets.all(ScreenUtil.unitHeight * 20),
+                              padding: EdgeInsets.all(
+                                ScreenUtil.unitHeight * 20,
+                              ),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -324,7 +371,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     backgroundColor: color,
                                     child: Icon(icon, color: Colors.white),
                                   ),
-                                 SizedBox(height: ScreenUtil.unitHeight * 20),
+                                  SizedBox(height: ScreenUtil.unitHeight * 20),
                                   Text(
                                     _truncateUserType(typeKey),
                                     style: const TextStyle(
@@ -380,14 +427,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _onUserTypeGridTap(String userType, int count) {
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) => UserListScreen(filterByType: userType),
-    //   ),
-    // );
-
-    print('Tapped on $userType with count: $count');
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UserListScreen(userType: userType),
+      ),
+    );
   }
 
   Widget _buildTableSection(dynamic stats) {
@@ -397,7 +442,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Recently Added Users',
+            'Recently Added Warranties',
             style: TextStyle(
               fontSize: ScreenUtil.unitHeight * 24,
               fontWeight: FontWeight.bold,
@@ -435,9 +480,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       child: Row(
                         children: [
                           Container(
-                            width: 120,
+                            width: 150,
                             child: Text(
-                              'Name',
+                              'Customer Name',
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14,
@@ -446,20 +491,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                           ),
                           Container(
-                            width: 200,
+                            width: 150,
                             child: Text(
-                              'Email',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                                color: Colors.grey[700],
-                              ),
-                            ),
-                          ),
-                          Container(
-                            width: 120,
-                            child: Text(
-                              'Phone',
+                              'Product Model',
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14,
@@ -470,7 +504,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           Container(
                             width: 120,
                             child: Text(
-                              'User Type',
+                              'Warranty Key',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: 100,
+                            child: Text(
+                              'Premium',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: 120,
+                            child: Text(
+                              'Created Date',
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14,
@@ -485,7 +541,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                     if (stats.lastAddedUsers != null &&
                         stats.lastAddedUsers.isNotEmpty)
-                      ...stats.lastAddedUsers.map<Widget>((user) {
+                      ...stats.lastAddedUsers.map<Widget>((warranty) {
                         return Container(
                           margin: EdgeInsets.only(bottom: 8),
                           padding: EdgeInsets.symmetric(
@@ -500,9 +556,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           child: Row(
                             children: [
                               Container(
-                                width: 120,
+                                width: 150,
                                 child: Text(
-                                  user.name ?? '',
+                                  warranty.customerDetails.name,
                                   style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 14,
@@ -512,9 +568,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ),
                               ),
                               Container(
-                                width: 200,
+                                width: 150,
                                 child: Text(
-                                  user.email ?? '',
+                                  warranty.productDetails.modelName,
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: Colors.grey[600],
@@ -525,34 +581,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               Container(
                                 width: 120,
                                 child: Text(
-                                  user.phone ?? '',
+                                  warranty.warrantyKey,
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 12,
                                     color: Colors.grey[600],
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                               Container(
+                                width: 100,
+                                child: Text(
+                                  '₹${warranty.warrantyDetails.premiumAmount}',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.green[600],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              Container(
                                 width: 120,
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.blue[50],
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text(
-                                    user.userType ?? '',
-                                    style: TextStyle(
-                                      color: Colors.blue[700],
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 12,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                    overflow: TextOverflow.ellipsis,
+                                child: Text(
+                                  _formatDate(warranty.dates.createdDate),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
                                   ),
                                 ),
                               ),
@@ -565,7 +619,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         padding: EdgeInsets.all(20),
                         child: Center(
                           child: Text(
-                            'No users data available',
+                            'No warranty data available',
                             style: TextStyle(color: Colors.grey[600]),
                           ),
                         ),
@@ -578,5 +632,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ],
       ),
     );
+  }
+
+  String _formatDate(String dateString) {
+    if (dateString.isEmpty) return '';
+    try {
+      final date = DateTime.parse(dateString);
+      return DateFormat('dd/MM/yyyy').format(date);
+    } catch (e) {
+      return dateString;
+    }
   }
 }

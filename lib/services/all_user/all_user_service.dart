@@ -20,6 +20,7 @@ class UserService {
     final url = Uri.parse('${baseUrl}api/users/get-all');
     print('📡 Sending POST request to: $url');
     print('🔐 Using token: $token');
+    print('📋 Filter userType: $userType, page: $page');
 
     final response = await http.post(
       url,
@@ -43,14 +44,13 @@ class UserService {
         return usersJson.map((user) => UserModel.fromJson(user)).toList();
       } catch (e) {
         print('❌ JSON Parsing Error: $e');
-        throw Exception('Failed to parse user data');
+        throw Exception('Failed to parse user data: $e');
       }
     } else {
       throw Exception('Failed to load users: ${response.statusCode}');
     }
   }
 }
-
 
 // GET SINGLE USER
 class UserDetailsService {
