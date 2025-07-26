@@ -13,15 +13,16 @@ class DashboardService {
     }
 
     final url = Uri.parse('${baseUrl}api/dashboard/stats');
-    print('📡 Sending GET request to: $url');
+    print('📡 Sending POST request to: $url');
     print('🔐 Using token: $token');
 
-    final response = await http.get(
+    final response = await http.post(
       url,
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
+      body: json.encode({}),
     );
 
     print('📥 Status Code: ${response.statusCode}');
