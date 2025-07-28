@@ -1,4 +1,5 @@
 import 'package:e_warranty/provider/dashboard_provider.dart';
+import 'package:e_warranty/screens/all_customer.dart';
 import 'package:e_warranty/screens/all_user.dart';
 import 'package:e_warranty/screens/wallet_history.dart';
 import 'package:e_warranty/utils/pixelutil.dart';
@@ -441,13 +442,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Recently Added Warranties',
-            style: TextStyle(
-              fontSize: ScreenUtil.unitHeight * 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Recently Added Customers',
+                style: TextStyle(
+                  fontSize: ScreenUtil.unitHeight * 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[800],
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AllCustomer(),
+                    ),
+                  );
+                },
+                child: Text(
+                  'View All',
+                  style: TextStyle(
+                    fontSize: ScreenUtil.unitHeight * 16,
+                    color: Colors.blue[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
           ),
           SizedBox(height: ScreenUtil.unitHeight * 20),
           Container(

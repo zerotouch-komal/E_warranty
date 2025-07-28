@@ -1,4 +1,5 @@
 import 'package:e_warranty/provider/all_user_provider.dart';
+import 'package:e_warranty/provider/customer_provider.dart';
 import 'package:e_warranty/provider/dashboard_provider.dart';
 import 'package:e_warranty/provider/get_single_user_provider.dart';
 import 'package:e_warranty/provider/wallet_provider.dart';
@@ -13,7 +14,7 @@ import 'package:provider/provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SharedPreferenceHelper.init();
-  
+
   runApp(const MyApp());
 }
 
@@ -22,12 +23,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
+
     ScreenUtil.initialize(context);
     
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => DashboardProvider()),
         ChangeNotifierProvider(create: (_) => KeyHistoryProvider()),
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
@@ -35,12 +36,22 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => KeyTransferProvider()),
         ChangeNotifierProvider(create: (_) => RegisterProvider()),
         ChangeNotifierProvider(create: (_) => SingleUserProvider()),
-
+        ChangeNotifierProvider(create: (_) => CustomerProvider()),
+        ChangeNotifierProvider(create: (_) => CustomerDetailProvider()),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'E-Warranty App',
-        home: const SplashScreen(),
+      child: Builder(
+        builder: (context) {
+          
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Provider.of<AuthProvider>(context, listen: false).initializeAuth();
+          });
+
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'E-Warranty App',
+            home: const SplashScreen(),
+          );
+        },
       ),
     );
   }
