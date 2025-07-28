@@ -70,10 +70,10 @@ class _RetailerDashboardState extends State<RetailerDashboard> {
               _refreshDashboard();
             },
           ),
-          IconButton(
-            icon: Icon(Icons.notifications_outlined, color: Color(0xFF0D47A1)),
-            onPressed: () {},
-          ),
+          // IconButton(
+          //   icon: Icon(Icons.notifications_outlined, color: Color(0xFF0D47A1)),
+          //   onPressed: () {},
+          // ),
           IconButton(
             icon: Icon(Icons.logout, color: Color(0xFF0D47A1)),
             onPressed: () {
@@ -464,15 +464,23 @@ class _RetailerDashboardState extends State<RetailerDashboard> {
               ),
             ),
             SizedBox(width: 12),
-            Expanded(
-              child: _buildActionButton(
-                title: 'View\nClaims',
-                icon: Icons.assignment_rounded,
-                color: Color(0xFFE65100),
-                bgColor: Color(0xFFFFF3E0),
-                onTap: () {},
-              ),
-            ),
+         Expanded(
+  child: _buildActionButton(
+    title: 'View\nClaims',
+    icon: Icons.assignment_rounded,
+    color: Color(0xFFE65100),
+    bgColor: Color(0xFFFFF3E0),
+    onTap: () {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No claims available'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    },
+  ),
+),
+
           ],
         ),
       ],

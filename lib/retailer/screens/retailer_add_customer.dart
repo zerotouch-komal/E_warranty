@@ -1,10 +1,10 @@
+import 'package:e_warranty/retailer/models/categories_model.dart';
 import 'package:e_warranty/retailer/models/warranty_plans_model.dart';
 import 'package:e_warranty/retailer/services/customer_service.dart';
+import 'package:e_warranty/retailer/services/file_handle_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
 
@@ -15,18 +15,21 @@ class CustomerForm extends StatefulWidget {
 }
 
 class _CustomerFormState extends State<CustomerForm> {
-    late Future<List<WarrantyPlans>> _warrantyPlans;
+  late Future<List<Categories>> _categories;
+
+  late Future<List<WarrantyPlans>> _warrantyPlans;
 
   @override
   void initState() {
     super.initState();
     _warrantyPlans = fetchWarrantyPlans();
+    _categories = fetchCategories();
   }
 
   int _currentPage = 0;
   final PageController _pageController = PageController();
 
-  static final Map<String, dynamic> _formData = {
+  final Map<String, dynamic> _formData = {
     'customer': <String, String>{},
     'product': <String, String>{},
     'invoice': <String, dynamic>{
@@ -34,9 +37,9 @@ class _CustomerFormState extends State<CustomerForm> {
       'invoiceImage': null,
     },
     'images': <String, dynamic>{
-      'frontImage': null, 
-      'backImage': null, 
-      'additionalImages': <String>[], 
+      'frontImage': null,
+      'backImage': null,
+      'additionalImages': <String>[],
     },
     'warranty': <String, dynamic>{
       'startDate': DateTime.now(),
@@ -55,7 +58,7 @@ class _CustomerFormState extends State<CustomerForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(_pageTitles[_currentPage]),
         backgroundColor: Colors.blue[700],
@@ -70,7 +73,7 @@ class _CustomerFormState extends State<CustomerForm> {
             child: LinearProgressIndicator(
               value: (_currentPage + 1) / 5,
               backgroundColor: Colors.grey[300],
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue[700]!),
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.green[500]!),
             ),
           ),
 
@@ -80,11 +83,17 @@ class _CustomerFormState extends State<CustomerForm> {
               controller: _pageController,
               onPageChanged: (index) => setState(() => _currentPage = index),
               children: [
-                ProductDetailsScreen(data: _formData['product']),
+                ProductDetailsScreen(
+                  data: _formData['product'],
+                  categoriesFuture: _categories,
+                ),
                 CustomerDetailsScreen(data: _formData['customer']),
                 InvoiceDetailsScreen(data: _formData['invoice']),
                 ProductImagesScreen(data: _formData['images']),
-                WarrantyDetailsScreen(data: _formData['warranty'],  warrantyPlansFuture: _warrantyPlans,),
+                WarrantyDetailsScreen(
+                  data: _formData['warranty'],
+                  warrantyPlansFuture: _warrantyPlans,
+                ),
               ],
             ),
           ),
@@ -94,13 +103,7 @@ class _CustomerFormState extends State<CustomerForm> {
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 4,
-                  offset: Offset(0, -2),
-                ),
-              ],
+            
             ),
             child: Row(
               children: [
@@ -164,10 +167,11 @@ class _CustomerFormState extends State<CustomerForm> {
       },
       "productDetails": {
         "modelName": _formData['product']['modelName'] ?? '',
-        "imei1": _formData['product']['imei1'] ?? '',
-        "imei2": _formData['product']['imei2'] ?? '',
+        "serialNumber": _formData['product']['serialNumber'] ?? '',
+        "orignalWarranty": _formData['product']['orignalWarranty'] ?? '',
         "brand": _formData['product']['brand'] ?? '',
         "category": _formData['product']['category'] ?? '',
+        "categoryId": _formData['product']['categoryId'] ?? '',
         "purchasePrice":
             double.tryParse(_formData['product']['purchasePrice'] ?? '') ?? 0,
       },
@@ -223,7 +227,6 @@ class _CustomerFormState extends State<CustomerForm> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final String message =
             decoded['message'] ?? 'Customer created successfully.';
-      
 
         if (mounted) {
           showDialog(
@@ -271,93 +274,104 @@ class _CustomerFormState extends State<CustomerForm> {
   }
 }
 
-// File Upload Service
-class FileUploadService {
-  static const String baseUrl = 'https://boxer-patient-slowly.ngrok-free.app';
-  static const String uploadEndpoint = '/api/customers/handle-file';
+// Individual Screen Components (Ultra Lightweight)
+class ProductDetailsScreen extends StatefulWidget {
+  final Map<String, String> data;
+  final Future<List<Categories>> categoriesFuture;
 
-  static Future<String?> uploadFile(File file) async {
-    try {
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse('$baseUrl$uploadEndpoint'),
-      );
+  ProductDetailsScreen({required this.data, required this.categoriesFuture});
 
-      // Add the file
-      request.files.add(await http.MultipartFile.fromPath('file', file.path));
-
-      // Add mode parameter
-      request.fields['mode'] = 'upload';
-
-      var response = await request.send();
-      var responseBody = await response.stream.bytesToString();
-
-      if (response.statusCode == 200) {
-        var jsonResponse = jsonDecode(responseBody);
-        String relativePath = jsonResponse['message'];
-        return '$baseUrl$relativePath'; // Return full URL
-      } else {
-        print('Upload failed: ${response.statusCode}');
-        return null;
-      }
-    } catch (e) {
-      print('Upload error: $e');
-      return null;
-    }
-  }
-
-  static Future<bool> deleteFile(String fileUrl) async {
-    try {
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse('$baseUrl$uploadEndpoint'),
-      );
-
-      // Add mode and deleteFile parameters
-      request.fields['mode'] = 'delete';
-      request.fields['deleteFile'] = fileUrl;
-
-      var response = await request.send();
-      var responseBody = await response.stream.bytesToString();
-
-      if (response.statusCode == 200) {
-        var jsonResponse = jsonDecode(responseBody);
-        return jsonResponse['message'] == 'deleted';
-      } else {
-        print('Delete failed: ${response.statusCode}');
-        return false;
-      }
-    } catch (e) {
-      print('Delete error: $e');
-      return false;
-    }
-  }
+  @override
+  State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
 }
 
-// Individual Screen Components (Ultra Lightweight)
-class ProductDetailsScreen extends StatelessWidget {
-  final Map<String, String> data;
-
-  ProductDetailsScreen({required this.data});
+class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
+  Categories? selectedCategory;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(16),
-      child: Column(
-        children: [
-          _buildSimpleField('Model Name', 'modelName'),
-          _buildSimpleField('IMEI 1', 'imei1', TextInputType.number),
-          _buildSimpleField('IMEI 2 (Optional)', 'imei2', TextInputType.number),
-          _buildSimpleField('Brand', 'brand'),
-          _buildSimpleField('Category', 'category'),
-          _buildSimpleField(
-            'Purchase Price',
-            'purchasePrice',
-            TextInputType.number,
-          ),
-        ],
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          children: [
+            _buildSimpleField('Product Name', 'modelName'),
+            _buildSimpleField(
+              'Serial Number',
+              'serialNumber',
+              TextInputType.number,
+            ),
+            _buildSimpleField(
+              'Original Warranty Duration',
+              'orignalWarranty',
+              TextInputType.number,
+            ),
+            _buildSimpleField('Brand', 'brand'),
+            _buildCategoryDropdown(),
+            _buildSimpleField(
+              'Purchase Price',
+              'purchasePrice',
+              TextInputType.number,
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildCategoryDropdown() {
+    return FutureBuilder<List<Categories>>(
+      future: widget.categoriesFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasError) {
+          return Text("Error loading categories: ${snapshot.error}");
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Text("No categories available");
+        } else {
+          final categories = snapshot.data!;
+          final dropdownItems = <DropdownMenuItem<Categories>>[
+            const DropdownMenuItem<Categories>(
+              value: null,
+              enabled: false,
+              child: Text(
+                "Select Category",
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+            ...categories.map((cat) {
+              return DropdownMenuItem<Categories>(
+                value: cat,
+                child: Text(cat.categoryName),
+              );
+            }).toList(),
+          ];
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: DropdownButtonFormField<Categories>(
+              decoration: const InputDecoration(
+                labelText: "Category",
+                border: OutlineInputBorder(),
+              ),
+              value: selectedCategory,
+              hint: const Text("Select Category"),
+              items: dropdownItems,
+              onChanged: (category) {
+                setState(() {
+                  selectedCategory = category;
+                  widget.data['category'] = category!.categoryName;
+                  widget.data['categoryId'] = category.id;
+                });
+              },
+            ),
+          );
+        }
+      },
     );
   }
 
@@ -372,7 +386,7 @@ class ProductDetailsScreen extends StatelessWidget {
           fillColor: Colors.white,
         ),
         keyboardType: type,
-        onChanged: (value) => data[key] = value,
+        onChanged: (value) => widget.data[key] = value,
       ),
     );
   }
@@ -439,21 +453,23 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(16),
-      child: Column(
-        children: [
-          _buildSimpleField('Invoice Number', 'invoiceNumber'),
-          _buildSimpleField(
-            'Invoice Amount',
-            'invoiceAmount',
-            TextInputType.number,
-          ),
-          SizedBox(height: 16),
-          _buildImageSection(),
-          SizedBox(height: 16),
-          _buildDatePicker(),
-        ],
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          children: [
+            _buildSimpleField('Invoice Number', 'invoiceNumber'),
+            _buildSimpleField(
+              'Invoice Amount',
+              'invoiceAmount',
+              TextInputType.number,
+            ),
+            SizedBox(height: 16),
+            _buildImageSection(),
+            SizedBox(height: 16),
+            _buildDatePicker(),
+          ],
+        ),
       ),
     );
   }
@@ -585,7 +601,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
     if (image != null) {
       setState(() => _isUploading = true);
 
-      final uploadedUrl = await FileUploadService.uploadFile(File(image.path));
+      final uploadedUrl = await uploadFile(File(image.path));
 
       setState(() {
         _isUploading = false;
@@ -605,7 +621,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
     if (imageUrl != null) {
       setState(() => _isUploading = true);
 
-      final success = await FileUploadService.deleteFile(imageUrl);
+      final success = await deleteFile(imageUrl);
 
       setState(() {
         _isUploading = false;
@@ -794,7 +810,7 @@ class _ProductImagesScreenState extends State<ProductImagesScreen> {
     if (image != null) {
       setState(() => _isUploading = true);
 
-      final uploadedUrl = await FileUploadService.uploadFile(File(image.path));
+      final uploadedUrl = await uploadFile(File(image.path));
 
       setState(() {
         _isUploading = false;
@@ -814,7 +830,7 @@ class _ProductImagesScreenState extends State<ProductImagesScreen> {
     if (image != null) {
       setState(() => _isUploading = true);
 
-      final uploadedUrl = await FileUploadService.uploadFile(File(image.path));
+      final uploadedUrl = await uploadFile(File(image.path));
 
       setState(() {
         _isUploading = false;
@@ -842,7 +858,7 @@ class _ProductImagesScreenState extends State<ProductImagesScreen> {
       final imageUrl = imageUrls[index];
       setState(() => _isUploading = true);
 
-      final success = await FileUploadService.deleteFile(imageUrl);
+      final success = await deleteFile(imageUrl);
 
       setState(() {
         _isUploading = false;
@@ -863,7 +879,7 @@ class _ProductImagesScreenState extends State<ProductImagesScreen> {
     if (imageUrl != null) {
       setState(() => _isUploading = true);
 
-      final success = await FileUploadService.deleteFile(imageUrl);
+      final success = await deleteFile(imageUrl);
 
       setState(() {
         _isUploading = false;
@@ -878,6 +894,7 @@ class _ProductImagesScreenState extends State<ProductImagesScreen> {
     }
   }
 }
+
 class WarrantyDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> data;
   final Future<List<WarrantyPlans>> warrantyPlansFuture;
@@ -923,12 +940,15 @@ class _WarrantyDetailsScreenState extends State<WarrantyDetailsScreen> {
                 ),
                 value: selectedPlan,
                 isExpanded: true,
-                items: plans.map((plan) {
-                  return DropdownMenuItem<WarrantyPlans>(
-                    value: plan,
-                    child: Text('${plan.planName} (${plan.duration} months, ₹${plan.premiumAmount})'),
-                  );
-                }).toList(),
+                items:
+                    plans.map((plan) {
+                      return DropdownMenuItem<WarrantyPlans>(
+                        value: plan,
+                        child: Text(
+                          '${plan.planName} (${plan.duration} months, ₹${plan.premiumAmount})',
+                        ),
+                      );
+                    }).toList(),
                 onChanged: (WarrantyPlans? plan) {
                   if (plan != null) {
                     setState(() {
@@ -948,12 +968,20 @@ class _WarrantyDetailsScreenState extends State<WarrantyDetailsScreen> {
 
               _buildSimpleField('Plan ID', 'planId'),
               _buildSimpleField('Plan Name', 'planName'),
-              _buildSimpleField('Warranty Period (months)', 'warrantyPeriod', TextInputType.number),
-              _buildSimpleField('Premium Amount', 'premiumAmount', TextInputType.number),
+              _buildSimpleField(
+                'Warranty Period (months)',
+                'warrantyPeriod',
+                TextInputType.number,
+              ),
+              _buildSimpleField(
+                'Premium Amount',
+                'premiumAmount',
+                TextInputType.number,
+              ),
               SizedBox(height: 16),
-              _buildDatePicker('Start Date', 'startDate'),
-              SizedBox(height: 16),
-              _buildDatePicker('Expiry Date', 'expiryDate'),
+              // _buildDatePicker('Start Date', 'startDate'),
+              // SizedBox(height: 16),
+              // _buildDatePicker('Expiry Date', 'expiryDate'),
             ],
           ),
         );
@@ -965,8 +993,12 @@ class _WarrantyDetailsScreenState extends State<WarrantyDetailsScreen> {
     return Padding(
       padding: EdgeInsets.only(bottom: 16),
       child: TextField(
-        controller: TextEditingController(text: widget.data[key]?.toString() ?? '')
-          ..selection = TextSelection.collapsed(offset: (widget.data[key]?.toString() ?? '').length),
+        controller: TextEditingController(
+            text: widget.data[key]?.toString() ?? '',
+          )
+          ..selection = TextSelection.collapsed(
+            offset: (widget.data[key]?.toString() ?? '').length,
+          ),
         decoration: InputDecoration(
           labelText: label,
           border: OutlineInputBorder(),

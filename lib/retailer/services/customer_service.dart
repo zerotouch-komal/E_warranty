@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:e_warranty/retailer/models/categories_model.dart';
 import 'package:e_warranty/retailer/models/warranty_plans_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:e_warranty/constants/config.dart';
@@ -54,6 +55,31 @@ Future<List<WarrantyPlans>> fetchWarrantyPlans() async {
     }
   } catch (e) {
     print('Error fetching warrranty : $e');
+    rethrow;
+  }
+}
+
+
+Future<List<Categories>> fetchCategories() async {
+  final url = Uri.parse('${baseUrl}api/customers/categories');
+
+  try {
+    final headers = await _getAuthHeaders();
+    final response = await http.get(
+      url,
+      headers: headers,
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonList = jsonDecode(response.body);
+      return jsonList.map((json) => Categories.fromJson(json)).toList();
+    } else {
+      throw Exception(
+        'Failed to fetch categories. Status: ${response.statusCode}',
+      );
+    }
+  } catch (e) {
+    print('Error fetching categories: $e');
     rethrow;
   }
 }
