@@ -85,7 +85,7 @@ Future<List<Categories>> fetchCategories() async {
 }
 
 
-Future<List<CustomersData>> fetchAllCustomers() async {
+Future<CustomerListResponse> fetchAllCustomers(filter) async {
   final url = Uri.parse('${baseUrl}api/customers/all');
 
   try {
@@ -93,13 +93,12 @@ Future<List<CustomersData>> fetchAllCustomers() async {
     final response = await http.post(
       url,
       headers: headers,
-      body: jsonEncode({}),
+      body: jsonEncode(filter),
     );
 
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);
-      final List customers = jsonData['data']['customers'];
-      return customers.map((e) => CustomersData.fromJson(e)).toList();
+      return CustomerListResponse.fromJson(jsonData);
     } else {
       throw Exception(
         'Failed to fetch customers. Status: ${response.statusCode}',
@@ -110,6 +109,7 @@ Future<List<CustomersData>> fetchAllCustomers() async {
     rethrow;
   }
 }
+
 
 Future<ParticularCustomerData> fetchCustomerDetails(String customerId) async {
   final url = Uri.parse('${baseUrl}api/customers/get');

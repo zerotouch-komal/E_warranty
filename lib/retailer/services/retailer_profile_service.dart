@@ -60,3 +60,35 @@ Future<RetailerHierarchy> fetchRetailerHierarchy() async {
     rethrow;
   }
 }
+
+Future<void> changeRetailerPassword(
+  currentPassword,
+  newPassword,
+  confirmPassword,
+) async {
+  final url = Uri.parse('${baseUrl}api/auth/change-password');
+
+  try {
+    final headers = await _getAuthHeaders();
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: jsonEncode({
+        'currentPassword': currentPassword,
+        'newPassword': newPassword,
+        'confirmPassword': confirmPassword,
+      }),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final responseData = jsonDecode(response.body);
+      print("pswd: $responseData");
+    } else {
+      print('Failed to change password: ${response.body}');
+      throw Exception('Failed to change password');
+    }
+  } catch (e) {
+    print('Error changing password: $e');
+    rethrow;
+  }
+}

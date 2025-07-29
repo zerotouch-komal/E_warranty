@@ -105,16 +105,16 @@ class Address {
 
 class ProductDetails {
   final String modelName;
-  final String imei1;
-  final String imei2;
+  final String serialNumber;
+  final int orignalWarranty;
   final String brand;
   final String category;
   final int purchasePrice;
 
   ProductDetails({
     required this.modelName,
-    required this.imei1,
-    required this.imei2,
+    required this.serialNumber,
+    required this.orignalWarranty,
     required this.brand,
     required this.category,
     required this.purchasePrice,
@@ -123,8 +123,8 @@ class ProductDetails {
   factory ProductDetails.fromJson(Map<String, dynamic> json) {
     return ProductDetails(
       modelName: json['modelName'] ?? '',
-      imei1: json['imei1'] ?? '',
-      imei2: json['imei2'] ?? '',
+      serialNumber: json['serialNumber'] ?? '',
+      orignalWarranty: json['orignalWarranty'] ?? 0,
       brand: json['brand'] ?? '',
       category: json['category'] ?? '',
       purchasePrice: json['purchasePrice'] ?? 0,

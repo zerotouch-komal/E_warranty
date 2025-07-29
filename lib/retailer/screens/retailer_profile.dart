@@ -1,5 +1,7 @@
 import 'package:e_warranty/retailer/models/retailer_hierarchy_model.dart';
 import 'package:e_warranty/retailer/models/retailer_profile_model.dart';
+import 'package:e_warranty/retailer/screens/retailer_change_password.dart';
+import 'package:e_warranty/retailer/screens/retailer_drawer.dart';
 import 'package:e_warranty/retailer/services/retailer_profile_service.dart';
 import 'package:flutter/material.dart';
 
@@ -22,10 +24,6 @@ class _RetailerProfileScreenState extends State<RetailerProfileScreen> {
     ]);
   }
 
-  void _navigateToEditProfile() {
-    // Navigate to edit profile - To be implemented
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,50 +36,61 @@ class _RetailerProfileScreenState extends State<RetailerProfileScreen> {
         backgroundColor: Colors.blue[700],
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
-        // actions: [
-        //   Container(
-        //     margin: const EdgeInsets.only(right: 8),
-        //     child: IconButton(
-        //       onPressed: _navigateToEditProfile,
-        //       icon: const Icon(Icons.edit, color: Colors.white, size: 24),
-        //       tooltip: 'Edit Profile',
-        //       style: IconButton.styleFrom(
-        //         backgroundColor: Colors.blue[800],
-        //         shape: RoundedRectangleBorder(
-        //           borderRadius: BorderRadius.circular(8),
-        //         ),
-        //       ),
-        //     ),
-        //   ),
-        // ],
+        actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            child: IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => RetailerChangePasswordScreen()),
+                );
+              },
+              icon: const Icon(Icons.edit, color: Colors.white, size: 24),
+              tooltip: 'Edit Profile',
+              style: IconButton.styleFrom(
+                backgroundColor: Colors.blue[800],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
+      drawer: CustomDrawer(),
       body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             FutureBuilder<List<dynamic>>(
               future: combinedFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.blue,
+                  return Center(
+                    child: Container(
+                      height: MediaQuery.of(context).size.height,
+                      alignment: Alignment(0, 1),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.blue,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          'Loading profile & hierarchy...',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w500,
+                          SizedBox(height: 16),
+                          Text(
+                            'Loading your profile details...',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   );
                 } else if (snapshot.hasError) {

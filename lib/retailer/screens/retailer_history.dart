@@ -1,4 +1,5 @@
 import 'package:e_warranty/retailer/models/history_model.dart';
+import 'package:e_warranty/retailer/screens/retailer_drawer.dart';
 import 'package:e_warranty/retailer/services/history_service.dart';
 import 'package:flutter/material.dart';
 
@@ -113,6 +114,7 @@ class _HistoryDataState extends State<HistoryData> {
         foregroundColor: Colors.white,
         elevation: 2,
       ),
+      drawer: CustomDrawer(),
       body: Column(
         children: [
           // Sort Filter Section

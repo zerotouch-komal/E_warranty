@@ -61,7 +61,7 @@ class _WalletHistoryState extends State<WalletHistory> {
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: const Text(
-          "Key History",
+          "Wallet History",
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
         ),
         backgroundColor: Colors.white,

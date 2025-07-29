@@ -266,13 +266,13 @@ class _ViewCustomerState extends State<ViewCustomer> {
             icon: Icons.category_outlined,
           ),
           _buildInfoRow(
-            label: 'IMEI 1',
-            value: details.imei1,
+            label: 'Serial Number',
+            value: details.serialNumber,
             icon: Icons.pin_outlined,
           ),
           _buildInfoRow(
-            label: 'IMEI 2',
-            value: details.imei2,
+            label: 'Orignal Warranty',
+            value: details.orignalWarranty > 0 ? '${details.orignalWarranty}': '',
             icon: Icons.pin_outlined,
           ),
           _buildInfoRow(

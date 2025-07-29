@@ -1,8 +1,8 @@
 import 'package:e_warranty/retailer/models/categories_model.dart';
 import 'package:e_warranty/retailer/models/warranty_plans_model.dart';
-import 'package:e_warranty/retailer/screens/util/add_customer_components/customer_details.dart';
-import 'package:e_warranty/retailer/screens/util/add_customer_components/invoice_details.dart';
-import 'package:e_warranty/retailer/screens/util/add_customer_components/product_images.dart';
+import 'package:e_warranty/retailer/screens/utils/add_customer_components/customer_details.dart';
+import 'package:e_warranty/retailer/screens/utils/add_customer_components/invoice_details.dart';
+import 'package:e_warranty/retailer/screens/utils/add_customer_components/product_images.dart';
 import 'package:e_warranty/retailer/services/customer_form_submit.dart';
 import 'package:e_warranty/retailer/services/customer_service.dart';
 import 'package:flutter/material.dart';
