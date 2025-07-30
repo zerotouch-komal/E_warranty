@@ -11,8 +11,10 @@ Future<Map<String, String>> _getAuthHeaders() async {
   return {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'};
 }
 
-Future<List<RetailerHistoryData>> fetchRetailerHistoryData() async {
+Future<HistoryAndPaginationResponse> fetchRetailerHistoryData(filter) async {
   final userId = SharedPreferenceHelper.instance.getString('userId');
+  filter["userId"] = userId;
+  
   final url = Uri.parse('${baseUrl}api/wallet/history');
 
   try {
@@ -20,16 +22,12 @@ Future<List<RetailerHistoryData>> fetchRetailerHistoryData() async {
     final response = await http.post(
       url,
       headers: headers,
-      body: jsonEncode({"userId": userId}),
+      body: jsonEncode(filter),
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       final jsonData = jsonDecode(response.body);
-      final List<dynamic> historyList = jsonData['data']['history'];
-
-      return historyList
-          .map((item) => RetailerHistoryData.fromJson(item))
-          .toList();
+      return HistoryAndPaginationResponse.fromJson(jsonData);
     } else {
       print('Failed to fetch History data: ${response.body}');
       throw Exception('Failed to fetch History data');

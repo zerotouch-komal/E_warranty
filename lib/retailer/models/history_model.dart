@@ -128,3 +128,54 @@ class FromUser {
     return {'_id': id, 'userId': userId, 'userType': userType, 'name': name};
   }
 }
+
+class HistoryPaginationData {
+  final int currentPage;
+  final int totalPages;
+  final int totalData;
+  final int limit;
+
+  HistoryPaginationData({
+    required this.currentPage,
+    required this.totalPages,
+    required this.totalData,
+    required this.limit,
+  });
+
+  factory HistoryPaginationData.fromJson(Map<String, dynamic> json) {
+    return HistoryPaginationData(
+      currentPage: json['currentPage'],
+      totalPages: json['totalPages'],
+      totalData: json['totalData'],
+      limit: json['limit'],
+    );
+  }
+}
+
+class HistoryAndPaginationResponse {
+  final List<RetailerHistoryData> retailerHistory;
+  final HistoryPaginationData historyPagination;
+
+  HistoryAndPaginationResponse({
+    required this.retailerHistory,
+    required this.historyPagination,
+  });
+
+  factory HistoryAndPaginationResponse.fromJson(Map<String, dynamic> json) {
+    final data = json['data'];
+
+    final retailerHistory =
+        (data['history'] as List)
+            .map((e) => RetailerHistoryData.fromJson(e))
+            .toList();
+
+    final historyPagination = HistoryPaginationData.fromJson(
+      data['pagination'],
+    );
+
+    return HistoryAndPaginationResponse(
+      retailerHistory: retailerHistory,
+      historyPagination: historyPagination,
+    );
+  }
+}
