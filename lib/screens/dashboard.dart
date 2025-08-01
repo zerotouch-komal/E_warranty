@@ -1,6 +1,7 @@
 import 'package:e_warranty/provider/dashboard_provider.dart';
 import 'package:e_warranty/screens/all_customer.dart';
 import 'package:e_warranty/screens/all_user.dart';
+import 'package:e_warranty/screens/customer_detail.dart';
 import 'package:e_warranty/screens/wallet_history.dart';
 import 'package:e_warranty/utils/pixelutil.dart';
 import 'package:flutter/material.dart';
@@ -47,13 +48,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             fontSize: ScreenUtil.unitHeight * 26,
           ),
         ),
-        // actions: [
-        //   IconButton(
-        //     icon: const Icon(Icons.notifications_none_rounded),
-        //     tooltip: 'Notifications',
-        //     onPressed: () {},
-        //   ),
-        // ],
       ),
 
       body: Consumer<DashboardProvider>(
@@ -157,14 +151,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             padding: EdgeInsets.all(ScreenUtil.unitHeight * 24),
             child: Row(
               children: [
-                // Expanded(
-                //   child: _buildStatCard(
-                //     'Total Amount',
-                //     '₹${_formatCurrency(stats?.walletBalance.totalAmount ?? 0)}',
-                //     Colors.blue[400]!,
-                //     Icons.account_balance_wallet,
-                //   ),
-                // ),
                 Container(
                   width: 1,
                   height: ScreenUtil.unitHeight * 20,
@@ -566,75 +552,78 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     if (stats.lastAddedUsers != null &&
                         stats.lastAddedUsers.isNotEmpty)
                       ...stats.lastAddedUsers.map<Widget>((warranty) {
-                        return Container(
-                          margin: EdgeInsets.only(bottom: 8),
-                          padding: EdgeInsets.symmetric(
-                            vertical: 16,
-                            horizontal: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.grey[200]!),
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 150,
-                                child: Text(
-                                  warranty.customerDetails.name,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 14,
-                                    color: Colors.grey[800],
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              Container(
-                                width: 150,
-                                child: Text(
-                                  warranty.productDetails.modelName,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey[600],
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              Container(
-                                width: 120,
-                                child: Text(
-                                  warranty.warrantyKey,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey[600],
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              Container(
-                                width: 100,
-                                child: Text(
-                                  '₹${warranty.warrantyDetails.premiumAmount}',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.green[600],
-                                    fontWeight: FontWeight.w500,
+                        return GestureDetector(
+                          onTap: () => _navigateToCustomerDetail(warranty),
+                          child: Container(
+                            margin: EdgeInsets.only(bottom: 8),
+                            padding: EdgeInsets.symmetric(
+                              vertical: 16,
+                              horizontal: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.grey[200]!),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 150,
+                                  child: Text(
+                                    warranty.customerDetails.name,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14,
+                                      color: Colors.grey[800],
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                              ),
-                              Container(
-                                width: 120,
-                                child: Text(
-                                  _formatDate(warranty.dates.createdDate),
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey[600],
+                                Container(
+                                  width: 150,
+                                  child: Text(
+                                    warranty.productDetails.modelName,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                              ),
-                            ],
+                                Container(
+                                  width: 120,
+                                  child: Text(
+                                    warranty.warrantyKey,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Container(
+                                  width: 100,
+                                  child: Text(
+                                    '₹${warranty.warrantyDetails.premiumAmount}',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.green[600],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width: 120,
+                                  child: Text(
+                                    _formatDate(warranty.dates.createdDate),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       }).toList()
@@ -656,6 +645,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ],
       ),
     );
+  }
+
+  void _navigateToCustomerDetail(dynamic warranty) {
+    String customerId = warranty.customerId ?? warranty.id ?? '';
+    
+    if (customerId.isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CustomerDetailScreen(customerId: customerId),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Customer ID not available'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   String _formatDate(String dateString) {
